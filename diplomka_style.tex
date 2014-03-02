@@ -1,0 +1,26 @@
+\input cs-adventor
+\input cs-pagella
+\ifx\font\corkencoded \def\tmp{ec}\else\def\tmp{cs}\fi
+\font\tenss   =\tmp-qhvr  \sizespec
+\font\tenssi  =\tmp-qhvri \sizespec
+\font\tenssb  =\tmp-qhvb  \sizespec
+\font\tenssbi =\tmp-qhvbi \sizespec
+\regfont\tenss \regfont\tenssi \regfont\tenssb \regfont\tenssbi
+\regfont\tenbfc
+\def\ss{\tenss\thefontscale[900]} \def\ssi{\tenssi\thefontscale[900]}
+\def\tt{\tentt\thefontscale[1050]}
+\font\thumbbf=\tmp-qagb \sizespec
+
+\letfont\fourteenrm=\tenrm at14pt
+\letfont\sixteenrm=\tenrm at16pt
+% 
+\letfont\fourteenbf=\tenbf at14pt
+\letfont\sixteenbf=\tenbf at16pt
+\letfont\eighteenbf=\tenbf at18pt
+
+\def\headrule{\leaders\hrule height3pt depth-2.6pt\hfil}
+\def\zahlavi{\relax}
+\headline={\zahlavi}
+
+\newtoks\title
+\title={}
