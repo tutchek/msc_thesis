@@ -1,0 +1,40 @@
+\newpage
+
+\label[chap:research]
+
+\chap Research
+
+\sec Transportation problems
+
+The problem as described in the chapter \ref[chap:motivation] is an instance of transportation problems. As described in \cite[Helmert2003], 
+we can expect that this problem is NP-complete.
+
+\sec Operation research
+
+\sec Vehicle routing problems
+
+\secc Capacitated vehicle routing problem
+
+As described in \cite[Dantzig1959], the capacitated vehicle routing problem (cVRP, originally The Truck Dispatching Problem) may be defined as follows:
+
+\begitems \style N
+* Given a set of $n$ ``station points'' $P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
+* A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between every pair of points $(i,j = 0, 1, \dots, n)$.
+* A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to every point $P_i\, (i=1,2,\dots,n)$.
+* The truck capacity is $C$, where $C > {\rm max}\,q_i$.
+* If $x_{ij} = x_{ji} = 1$ is interpreted to mean that points $P_i$ and $P_j$ are paired $(i,j = 0,1,\dots,n)$ and if $x_{ij} = x_{ji} = 0$ means that the points are not paired, one
+obtains the condition
+$$\sum_{j=0}^n{x_{ij}} = 1\quad (i=1,2,\dots,n)$$
+since every point $P_i$ is either connected with $P_0$ or at most one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
+* The problem is to find those values of $x_{ij}$  which make the total distance
+$$D = \sum_{i,j=0}^{n}{d_{ij}x_{ij}}$$
+a miniumum under the conditions specified in 2) to 5).
+\enditems
+
+\secc Vehicle routing problem as a job scheduling problem
+
+In \cite[Beck2002] the VRP is reformulated as an scheduling problem. However, these reformulations have not a same performance. As described in \cite[Beck2003], in an optimisation task
+the VRP is better in minimising of the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
+significantly worse than scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
+
+

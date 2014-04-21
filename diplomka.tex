@@ -1,9 +1,19 @@
 \input opmac
 \input diplomka_style
 
+\runningfnotes
+\def\thefnote{$^{\locfnum}$}
+
+% Radkovy rejstrik
+\parskip=0pt \bigskipamount=12pt \medskipamount=6pt
+\raggedbottom
+
+
+\def\newpage{\vfill\eject}
+
 \title={Algorithms for automated logistics}
 
-\margins/1 a4 (2,2,2,2)cm
+\margins/1 a4 (35,40,40,50)mm
 
 \footline={}
 
@@ -17,24 +27,24 @@
 \centerline{\picw=64mm \inspic mfflogo.pdf }
 \vfill
 \vskip5mm
-\centerline{\eighteenbf Bc. Michal Tuláček}
+\centerline{\eighteenbf Bc. Michal Tul\'{a}\v{c}ek}
 \vskip15mm
 \centerline{\eighteenbf \the\title}
 \vfill
 \centerline{Department of Theoretical Computer Science and Mathematical Logic}
 \vfill
 
-\+Supervisor of the master thesis&: & prof. RNDr. Roman Barták, Ph.D.\cr
+\+Supervisor of the master thesis:\qquad &prof. RNDr. Roman Bart\'{a}k, Ph.D.\cr
 \vskip5mm
-\+\hfill Study programme&: & Computer science\cr
-\+\hfill Specialization&: & Theoretical Computer Science\cr
+\+Study programme:&Computer science\cr
+\+Specialization:&Theoretical Computer Science\cr
 \vfill
 \centerline{Prague 2014}
 \endgroup
 \eject
 
 \footline={\hss\folio\hss}
-\def\zahlavi{\headrule \kern3pt {\it \the\title}}
+\def\zahlavi{{\it Bc. Michal Tul\'{a}\v{c}ek\kern3pt\headrule\kern3pt \the\title}}
 
 Thank you, thank you very much
 
@@ -49,9 +59,9 @@ sources, literature and other professional sources.
 \vskip5mm
 
 \noindent I understand that my work relates to the rights and obligations under the Act No.
-121/2000 Coll., the Copyright Act, as amended, in particular the fact that the Charles
+121\discretionary{/}{/}{/}2000~Sb., the Copyright Act, as amended, in particular the fact that the Charles
 University in Prague has the right to conclude a license agreement on the use of this
-work as a school work pursuant to Section 60 paragraph 1 of the Copyright Act.
+work as a school work pursuant to subsection 60 (1) of the Copyright Act.
 
 \vskip5mm
 
@@ -71,7 +81,19 @@ work as a school work pursuant to Section 60 paragraph 1 of the Copyright Act.
 
 \input chaps/introduction
 \input chaps/motivation
+\input chaps/research
+\input chaps/problem-formulation
+\input chaps/problem-solution
+\input chaps/benchmarks
+\input chaps/discussion
 \input chaps/conclusion
 
+\vfill\eject
+{\chapfont\noindent Bibliography}
+\bigskip
+
+\usebibtex{diplomka}{plain} 
+
+\vskip5mm
 
 \bye
