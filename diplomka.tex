@@ -1,15 +1,6 @@
 \input opmac
 \input diplomka_style
-
-\runningfnotes
-\def\thefnote{$^{\locfnum}$}
-
-% Radkovy rejstrik
-\parskip=0pt \bigskipamount=12pt \medskipamount=6pt
-\raggedbottom
-
-
-\def\newpage{\vfill\eject}
+% \draft
 
 \title={Algorithms for automated logistics}
 
@@ -43,8 +34,6 @@
 \endgroup
 \eject
 
-\footline={\hss\folio\hss}
-\def\zahlavi{{\it Bc. Michal Tul\'{a}\v{c}ek\kern3pt\headrule\kern3pt \the\title}}
 
 Thank you, thank you very much
 
@@ -70,6 +59,33 @@ work as a school work pursuant to subsection 60 (1) of the Copyright Act.
 \vskip15mm
 
 \eject
+{\parskip=6pt
+Title: \the\title
+
+Author: Michal Tul\'{a}\v{c}ek
+
+Department: Department of Theoretical Computer Science and Mathematical Logic
+
+Supervisor: prof. RNDr. Roman Bart\'{a}k, Ph.D.
+
+Abstract: ...
+
+Keywords: ...
+
+\vfil
+
+N\'{a}zev pr\'{a}ce: 
+
+Autor: Michal Tul\'{a}\v{c}ek}
+
+Vedouc\'{i} diplomov\'{e} pr\'{a}ce: prof. RNDr. Roman Bart\'{a}k, Ph.D.
+
+Abstrakt:
+
+Kl\'{i}\v{c}ov\'{a} slova:
+
+\vfil
+\eject
 
 {\chapfont\noindent Contents}
 \vskip5mm
@@ -79,9 +95,13 @@ work as a school work pursuant to subsection 60 (1) of the Copyright Act.
 
 \eject
 
+\footline={\hss\folio\hss}
+\def\zahlavi{\noindent{\it Bc. Michal Tul\'{a}\v{c}ek\kern3pt\headrule\kern3pt \the\title}}
+
 \input chaps/introduction
-\input chaps/motivation
-\input chaps/research
+\input chaps/problem-analysis
+\input chaps/models
+\input chaps/strategies
 \input chaps/problem-formulation
 \input chaps/problem-solution
 \input chaps/benchmarks
@@ -92,7 +112,7 @@ work as a school work pursuant to subsection 60 (1) of the Copyright Act.
 {\chapfont\noindent Bibliography}
 \bigskip
 
-\usebibtex{diplomka}{plain} 
+\usebibtex{diplomka}{apalike} 
 
 \vskip5mm
 

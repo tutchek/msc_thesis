@@ -1,0 +1,118 @@
+\newpage
+
+\label[chap:models]
+
+\chap Models
+
+In this chapter, we review useful models and techniques which shall help us formulate a model for the problem described in the chapter \ref[chap:] and approaches commonly used to solve
+such models.
+
+\sec Transportation problems
+
+The problem as described in the chapter \ref[chap:motivation] is an instance of transportation problem, as described in \cite[Helmert2003]. This paper describes a Transport task as a 9-tuple
+$(V, M, P, l_0, P_G, l_G, fuel_0, cap, road)$, where
+
+\begitems \style N
+* $V$ is a finite set of {\em locations},
+* $M$ is a finite set of {\em mobiles},
+* $P$ is a finite set of {\em portables},
+* $l_0:(M \cup P) \to V$ is the {\em initial location} function,
+* $P_G \subseteq P$ is the set of {\em goal portables},
+* $l_G: P_G \to V$ is the {\em goal location} function,
+* $fuel_0:V \to {\bbchar N} \cup \{\infty \}$ is the {\em initial fuel} function,
+* $cap: M\to {\bbchar N}$ is the {\em capacity} function, and finally
+* $road: M\to {\script P}(V \times V)$ is the {\em roadmap} function.
+\enditems
+
+We require that $V, M, {\fam 0 and\ } P$ are disjoint, and that $(V, road(m))$ is an undirected graph for all $m \in M$ (i.e., for all $m \in M$, the relation $road(m)$ is symmetric and irreflexive).
+
+The paper classifies the transportation problems into groups by the value of {\em capacity}, {\em fuel units} and {\em mobiles} parameters as follows:
+
+\bigskip
+
+\hfil\table{|c|c|c|c|}{\crl
+\bf capacity & one portable & unbounded & varies \crli
+\bf fuel units & one per location & unbounded & varies \crli
+\bf mobiles & one mobile & one roadmap & many roadmaps \crl}
+\par\nobreak\medskip
+\caption/t Values of the parameters of the transportation problems according to which the problems are classified.
+
+\bigskip
+
+we can expect that this problem is NP-complete.
+
+\sec Vehicle routing problems (VRP)
+
+Vehicle routing problem is a transportation problem solving the need to visit a certain amount of destinations with a fleet of trucks. The vehicle routing problem 
+is {\it NP-hard} \cite[Lenstra1981]. Still, the vehicle routing problem is widely used in real applications and thus is well researched. Lots of usage examples are 
+discussed in \cite[Golden2001].
+
+\sec Capacitated vehicle routing problem (cVRP)
+
+As described in \cite[Dantzig1959], the capacitated vehicle routing problem (originally The Truck Dispatching Problem) may be defined as follows:
+
+\begitems \style N
+* Given a set of $n$ ``station points'' $P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
+* A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between every pair of points $(i,j = 0, 1, \dots, n)$.
+* A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to every point $P_i\, (i=1,2,\dots,n)$.
+* The truck capacity is $C$, where $C > \max{q_i}$.
+* If $x_{ij} = x_{ji} = 1$ is interpreted to mean that points $P_i$ and $P_j$ are paired $(i,j = 0,1,\dots,n)$ and if $x_{ij} = x_{ji} = 0$ means that the points are not paired, one
+obtains the condition
+$$\sum_{j=0}^n{x_{ij}} = 1\quad (i=1,2,\dots,n)$$
+since every point $P_i$ is either connected with $P_0$ or at most one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
+* The problem is to find those values of $x_{ij}$  which make the total distance
+$$D = \sum_{i,j=0}^{n}{d_{ij}x_{ij}}$$
+a miniumum under the conditions specified in 2) to 5).
+\enditems
+
+\sec Vehicle routing problem with time windows (VRPTW)
+
+The VRPTW can be according to \cite[Braysy2005] described as follows:
+
+\begitems \style N
+* Let $G=(V,E)$ be a connected digraph consisting of a set of $n+1$ nodes, each of which can be serviced only within a specified time interval or time window and a set of non-negative weights,
+$d_{ij}$, and with associated travel times, $t_{ij}$.
+* The travel time, $t_{ij}$, includes a service time at node $i$, and a vehicle is permitted to arrive before the opening of the time window.
+* Node 0 represents the depot.
+* Each node $i$, apart from the depot, imposes a service requirement, $q_i$, that can be a delivery from or a pick-up for the depot.
+* The objective is to find the minimum number of tours, $K^\hv$, for a set of identical vehicles such that each node is reached within time window and the accumulated service up to any node
+does not exceed a positive number $Q$ (vehicle capacity).
+* A secondary objective can be imposed. It is either to minimize the total distance travelled or the duration of the routes.
+\enditems
+
+As the cited article states, the VRPTW is widely used and thus well researched problem. Moreover, there exists many heuristics to solve it.
+
+\sec Vehicle routing problem as a job scheduling problem
+
+In \cite[Beck2002] the VRP is reformulated as an scheduling problem. However, these reformulations have not a same performance. As described in \cite[Beck2003], in an optimisation task
+the VRP is better in minimising of the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
+significantly worse than scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
+
+
+\sec A classification scheme for vehicle routing ans scheduling problems
+
+As proposed in \cite[Desrochers1990], one can construct a classification scheme which can be used to select a appropriate model to solve a real-life problem. The scheme can be used only
+to handle static problems, where the data do not change. The scheme used a formalised language using four or five fields:
+
+\begitems \style N 
+* characteristics and constraints relevant only to a single address (the scheme uses the term address rather than customer),
+* characteristics relevant to a single vehicle, 
+* all program characteristics that cannot be identified with single address or vehicle, 
+* one or more objective functions
+* description of additional information about specific class of problem instances (this field is optional).
+\enditems
+
+For example the above mentioned cVRP expressed in this notation has the following form -- ``$1|m,cap|\,|{\fam0 sum}\,T_i$'' -- which means that there is one depot, $m$ vehicles each with the 
+capacity $cap$ and the objective function is sum of route durations.
+
+\sec Daily aircraft routing and scheduling problem (DA\-RSP)
+
+Different approach represents the DARSP described in \cite[Desaulniers1997]. The problem is to generate a schedule for a heterogeneous aircraft fleet covering a set of operational flight legs 
+with known departure time windows, durations and profits according to the aircraft type. In the cited paper the problem is defines as follows: {\it ``Given a heterogeneous aircraft fleet, a set
+of operational flight legs over a one-day horizon, departure time windows, durations and costs / revenues according to the aircraft type for each flight leg, find a fleet schedule that maximises 
+profits and satisfies certain additional constraints.''}
+
+In the paper there are two formulations of the DARSP. The first is based as a Set Partitioning with additional constraints and the second as the time constrained multi-commodity network flow
+formulation. For each of the formulations the paper propose a solution strategy. For the Set Partitioning approach the branch-and-bound strategy is feasible and for the multi-commodity network flow
+the Dantzing-Wolfe or Lagrangean relaxation embedded in a branch-and-bound search tree.
+

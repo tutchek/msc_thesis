@@ -11,6 +11,8 @@
 \def\tt{\tentt\thefontscale[1050]}
 \font\thumbbf=\tmp-qagb \sizespec
 
+\def\"#1{{\accent"7F #1}}
+
 \letfont\fourteenrm=\tenrm at14pt
 \letfont\sixteenrm=\tenrm at16pt
 % 
@@ -24,3 +26,23 @@
 
 \newtoks\title
 \title={}
+
+\nonumcitations 
+\def\cite[#1]{(\rcite[#1])}
+
+\runningfnotes
+\def\thefnote{$^{\locfnum}$}
+
+% Radkovy rejstrik
+\parskip=0pt \bigskipamount=12pt \medskipamount=6pt
+\raggedbottom
+
+\def\sc#1{#1}
+\def\newpage{\vfill\eject}
+
+\hyperlinks{\Blue}{\Green}
+
+\def\hv{\char`\*}
+
+
+

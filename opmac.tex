@@ -1,11 +1,11 @@
 % OPmac
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Petr Olsak, 2012, 2013
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Petr Olsak, 2012, 2013, 2014
 
 %% The history of versions is at the end of this file, after \endpinput
 
 \ifx\OPmacversion\undefined \else \endinput \fi
-\def\OPmacversion{Oct. 2013}
+\def\OPmacversion{Apr. 2014b}
 
 \immediate\write16{This is OPmac (Olsak's Plain macros), version <\OPmacversion>}
 
@@ -96,7 +96,8 @@
 \def\cnvhook{}     % hook before conversion of outlines
 \def\pghook{}      % hook in \output rutine
 \def\toclinehook{} % hook in \tocline
-\def\mnotehook{}   % hook in \mnote to corret its vertical position
+\def\fnotehook{}   % hook in \fnote
+\def\mnotehook{}   % hook in \mnote
 \def\captionhook#1{} % hook in \caption (#1 is "t" or "f")
 
 %%%%%%%%%%%%%% OPmac, CSplain and LaTeX logos, sec. 3.3 in opmac-d.pdf
@@ -224,15 +225,22 @@
 
 \def\mtext#1{\csname mt:#1:\csname lan:\the\language\endcsname\endcsname}
 
-\sdef{mt:chap:en}{Chapter}  \sdef{mt:chap:cz}{Kapitola}  \sdef{mt:chap:sk}{Kapitola}
-\sdef{mt:t:en}{Table}       \sdef{mt:t:cz}{Tabulka}      \sdef{mt:t:sk}{Tabu\v lka}
-\sdef{mt:f:en}{Figure}      \sdef{mt:f:cz}{Obr\'azek}    \sdef{mt:f:sk}{Obr\'azok}
+\sdef{mt:chap:en}{Chapter}  \sdef{mt:chap:cs}{Kapitola}  \sdef{mt:chap:sk}{Kapitola}
+\sdef{mt:t:en}{Table}       \sdef{mt:t:cs}{Tabulka}      \sdef{mt:t:sk}{Tabu\v lka}
+\sdef{mt:f:en}{Figure}      \sdef{mt:f:cs}{Obr\'azek}    \sdef{mt:f:sk}{Obr\'azok}
 
 \ifx\r\undefined \csname csaccents\endcsname \fi
 
 \sdef{lan:0}{en}  \sdef{lan:100}{en} \sdef{lan:101}{en}
-\sdef{lan:5}{cz}  \sdef{lan:15}{cz}  \sdef{lan:115}{cz}
+\sdef{lan:5}{cs}  \sdef{lan:15}{cs}  \sdef{lan:115}{cs}
 \sdef{lan:6}{sk}  \sdef{lan:16}{sk}  \sdef{lan:116}{sk}
+
+\ifx\uselanguage\undefined \else \message{OPmac: eTeX detected}
+  \bgroup
+     \uselanguage{czech}  \sxdef{lan:\the\language}{cs}
+     \uselanguage{slovak} \sxdef{lan:\the\language}{sk}
+  \egroup
+\fi
 
 %%%%%%%%%%%%%% REF file, sec 3.6 in opmac-d.pdf
 
@@ -355,7 +363,7 @@
   \ifx\dotocnumafter\relax \else
     \opwarning{\noexpand\dotocnum unused in printchap/printsec/printsecc}\fi
 }
-\def\insertmark#1{\toks0={#1}\mark{{\thetocnum} {\the\toks0}}}
+\def\insertmark#1{\toks0={#1}\mark{{\ifnonum\else\thetocnum\fi} {\the\toks0}}}
 
 \newskip\remskipamount
 \def\remskip{\afterassignment\remskipA \global\remskipamount}
@@ -391,7 +399,7 @@
       \parfillskip=0pt plus2fil
       \def\par{\endgraf\egroup}%
       \captionhook{#1}\noindent 
-      {\destheight=2.1em \wlabel{\csname the#1num\endcsname}}%
+      \wlabel{\csname the#1num\endcsname}%
       \printcaption{\mtext{#1}}{\csname the#1num\endcsname}%
 }
 \def\printcaption#1#2{{\bf#1 #2}\enspace}
@@ -400,7 +408,7 @@
 
 \def\eqmark{\global\advance\dnum by1
   \ifinner\else\eqno \fi 
-  {\destheight=2.1em \wlabel\thednum}\thednum
+  \wlabel\thednum \thednum
 }
 
 %%%%%%%%%%%%%% Items -- sec. 3.10 in opmac-d.pdf
@@ -853,10 +861,10 @@
 
 \def\restorecolor{{\def\tmp##1##2##3##4\end{\xdef\savedcolors{##4}%
    \def\tmpa{##2}\def\tmpb{##3}\writecolortrue
-   \ifx\tmpa\currcolork \else \pdfliteral{##2 k}\xdef\currcolork{##2}%
-      \ifnum##1=1 \writecolor k\fi\fi
-   \ifx\tmpb\currcolorK \else \pdfliteral{##3 K}\xdef\currcolorK{##3}%
-      \ifnum##1=1 \writecolor K\fi\fi}%
+      \ifx\tmpa\empty\else \ifx\tmpa\currcolork\else \pdfliteral{##2 k}\xdef\currcolork{##2}%
+         \ifnum##1=1 \writecolor k\fi\fi\fi
+      \ifx\tmpb\empty\else \ifx\tmpb\currcolorK\else \pdfliteral{##3 K}\xdef\currcolorK{##3}%
+         \ifnum##1=1 \writecolor K\fi\fi\fi}%
    \expandafter\tmp\savedcolors\end}}
 
 \addprotect\setcmykcolor  \addprotect\localcolor  \addprotect\longlocalcolor
@@ -873,7 +881,7 @@
 \def\XpdfcolorK#1{\def\pdflastcolorK{#1}}
 \let\pdflastcolork=\pdfblackcolor \let\pdflastcolorK=\pdfblackcolor
 
-\def\Xpage#1{\lastpage=#1 \fnotenumlocal=0
+\def\Xpage#1{\ifnum\lastpage=#1 \else \lastpage=#1 \fnotenumlocal=0
    \ifx\pdflastcolork\pdfblackcolor\else
       \isdefined{pgc:#1}\iftrue \else \sxdef{pgc:#1}{}\fi
       {\let\setpgcolor=\relax \sxdef{pgc:#1}%
@@ -881,7 +889,7 @@
    \ifx\pdflastcolorK\pdfblackcolor\else
       \isdefined{pgc:#1}\iftrue \else \sxdef{pgc:#1}{}\fi
       {\let\setpgcolor=\relax \sxdef{pgc:#1}%
-            {\csname pgc:#1\endcsname\setpgcolor K{\pdflastcolorK}}}\fi
+            {\csname pgc:#1\endcsname\setpgcolor K{\pdflastcolorK}}}\fi\fi
 }
 \def\setpgcolor#1#2{\pdfliteral{#2 #1}}
 
@@ -915,7 +923,7 @@
 
 %%%%%%%%%%%%%% Hyperrefs -- sec. 3.16 in opmac-d.pdf
 
-\newdimen\destheight \destheight=1.3em
+\def\destheight{1.4em}
 \def\destactive[#1:#2]{\if$#2$\else\ifvmode
       \tmpdim=\prevdepth \prevdepth=-1000pt
       \destbox[#1:#2]\prevdepth=\tmpdim
@@ -935,7 +943,7 @@
 }
 \def\toclink#1{\toclinkA{#1}}
 \def\pglink#1{#1}
-\def\citelink#1{#1}
+\def\citelink#1#2{#2}
 \def\reflink[#1]#2{#2}
 \def\ulink[#1]#2{{#2}}
 \def\urlcolor{}
@@ -944,7 +952,7 @@
    \let\dest=\destactive
    \def\toclink##1{\link[toc:##1]{\localcolor#1}{\toclinkA{##1}}}%
    \def\pglink##1{\link[pg:##1]{\localcolor#1}{##1}}%
-   \def\citelink##1{\link[cite:##1]{\localcolor#1}{##1}}%
+   \def\citelink##1##2{\link[cite:##1]{\localcolor#1}{##2}}%
    \def\reflink[##1]##2{\link[ref:##1]{\localcolor#1}{##2}}%
    \def\ulink[##1]##2{\urllink[url:##1]{##2}}%
    \def\urlcolor{\longlocalcolor#2}%
@@ -1147,10 +1155,13 @@
          \ifnum\tmpnum<\vinolines\space
          \vireadline \advance\tmpnum by1 \repeat      %% skip line
    \tmpnum=0 \ifnum\vidolines=0 \tmpnum=-1 \fi
-   \loop \ifeof\vifile \tmpnum=\vidolines\space \fi
-         \ifnum\tmpnum<\vidolines\space
-         \vireadline \penalty\ttpenalty \viprintline  %% print line
-             \ifnum\vidolines=0 \else\advance\tmpnum by1 \fi \repeat
+   \ifeof\vifile \tmpnum=\vidolines\space \fi
+   \loop \ifnum\tmpnum<\vidolines\space
+            \vireadline 
+            \ifeof\vifile \tmpnum=\vidolines\space \else
+               \penalty\ttpenalty \viprintline \fi  %% print line
+            \ifnum\vidolines=0 \else\advance\tmpnum by1 \fi 
+            \repeat
    \egroup\par\ttskip\testparB
 }
 \def\vireadline{\read\vifile to \tmp \global\advance\viline by1 }
@@ -1195,10 +1206,10 @@
     \ifnum\colnum=0\def\vvleft{\vvitem}\else\addto\ddlinedata{\vvitem}\fi\fi
     \let\tmpa=\vrule \addtabdata{\vrule}}
 
-\def\crl{\cr\noalign{\hrule}}
-\def\crll{\cr\noalign{\hrule\kern\hhkern\hrule}}
+\def\crl{\crcr\noalign{\hrule}}
+\def\crll{\crcr\noalign{\hrule\kern\hhkern\hrule}}
 
-\def\crli{\cr \omit \gdef\dditem{\omit\tablinefil}\gdef\vvitem{\tabvvline}%
+\def\crli{\crcr \omit \gdef\dditem{\omit\tablinefil}\gdef\vvitem{\tabvvline}%
    \vvleft\tablinefil\ddlinedata\cr}
 \def\crlli{\crli\noalign{\kern\hhkern}\crli}
 \def\tablinefil{\leaders\hrule\hfil}
@@ -1214,7 +1225,7 @@
 \def\rulewidthA{\edef\hrule{\orihrule height\the\tmpdim}%
                 \edef\vrule{\orivrule width\the\tmpdim}}
 
-\def\frame#1{\setbox0=\hbox{#1}\setbox1=\vbox{\hrule}%
+\long\def\frame#1{\setbox0=\hbox{{#1}}\setbox1=\vbox{\hrule}%
    \tmpdim=\dp0 \advance\tmpdim by\ht1 \advance\tmpdim by\hhkern
    \vbox{\hrule\hbox{\vrule\kern\vvkern
          \vbox{\kern\hhkern\box0\kern\hhkern}\kern\vvkern\vrule}%
@@ -1291,7 +1302,7 @@
    \iflocfnum \leavevmode\openref\wref\Xfnote{}%
       \isdefined{fn:\the\fnotenum}\iftrue
       \else\opwarning{unknown \noexpand\fnote mark. TeX me again}\fi\fi
-   \fnmarkx{\typobase\typoscale[800/800]\vfootnote\fnmarkx{#1}}%
+   \fnmarkx{\fnotehook\typobase\typoscale[800/800]\vfootnote\fnmarkx{#1}}%
 }
 \def\fnotemark#1{{\advance\fnotenum by#1\relax
    \isdefined{fn:\the\fnotenum}\iftrue\thefnote
@@ -1324,59 +1335,83 @@
       \openref\wref\Xmnote{}%
    \else \let\tmp=\mnotesfixed \fi
    \expandafter\ifx\tmp \left
-      \hbox to0pt{\kern-\mnotesize \kern-\mnoteindent
+      \hbox to0pt{\pdfsave\mnoteC\kern-\mnotesize \kern-\mnoteindent
          \vbox to0pt{\vss \setbox0=\vtop{\hsize=\mnotesize 
-            \leftskip=0pt plus 1fill \rightskip=0pt \relax \mnotehook \noindent#1}%
-         \dp0=0pt \box0 \kern\mnoteskip \global\mnoteskip=0pt}\hss}%
+            \leftskip=0pt plus 1fill \rightskip=0pt {\mnotehook\noindent#1\endgraf}}%
+         \dp0=0pt \box0 \kern\mnoteskip \global\mnoteskip=0pt}\hss\mnoteD\pdfrestore}%
    \else
-      \hbox to0pt{\kern\hsize \kern\mnoteindent
+      \hbox to0pt{\pdfsave\mnoteC\kern\hsize \kern\mnoteindent
          \vbox to0pt{\vss \setbox0=\vtop{\hsize=\mnotesize 
-             \rightskip=0pt plus 1fil \leftskip=0pt \relax \mnotehook \noindent#1}%
-          \dp0=0pt \box0 \kern\mnoteskip \global\mnoteskip=0pt}\hss}%
+             \rightskip=0pt plus 1fil \leftskip=0pt {\mnotehook\noindent#1\endgraf}}%
+          \dp0=0pt \box0 \kern\mnoteskip \global\mnoteskip=0pt}\hss\mnoteD\pdfrestore}%
    \fi
+}
+\def\mnoteC{\writecolorfalse \let\longlocalcolor=\localcolor
+   \edef\mnoteD{\xdef\noexpand\currcolork{\currcolork}\xdef\noexpand\currcolorK{\currcolorK}}%
+   \def\currcolork{}\def\currcolorK{}%
 }
 \def\Xmnote{\advance\mnotenum by1
    \sxdef{mn:\the\mnotenum}{\ifodd\lastpage \right \else \left \fi}}
 
 \def\fixmnotes#1{\def\mnotesfixed{#1}}
 
+
 %%%%%%%%%%%%%% \cite, \bib, \usebibtex, \usebbl -- sec. 3.23 in opmac-d.pdf
 
 \newwrite\auxfile                      % AUX file for BibTeX
 \newcount\bibnum                       % the bibitem counter
+\newtoks\bibmark                       % the bibmark used if \nonumcitations
 \newcount\lastcitenum  \lastcitenum=0  % for \shortcitations
 
-\def\cite[#1]{{[\chardef\tmpb=0 \citeA #1,,,%
-   \ifnum\tmpb>0 \printdashcite{\the\tmpb}\fi]}}
-\def\nocite[#1]{{\def\docite##1{}\citeA #1,,,}}
-\def\citeA #1#2,{\if#1,\else \rcite{#1#2}\expandafter\citeA\fi}
-\def\citesep{}
+\def\cite[#1]{{\citeA#1,,,[\printsavedcites]}}
+\def\nocite[#1]{{\citeA#1,,,}}
+\def\rcite[#1]{{\citeA#1,,,\printsavedcites}}
+\def\savedcites{}
 
-\def\rcite#1{%
+\def\citeA #1#2,{\if#1,\else 
    \if *#1\addcitelist{*}\expandafter \skiptorelax \fi
-   \expandafter \ifx \csname bib:#1\endcsname \relax
-      \addcitelist{#1}%
-      \opwarning{The cite [#1] unknown. Try to TeX me again}%
-      \docite{}\openref
-      \expandafter\gdef\csname bib:#1\endcsname {}%
+   \isdefined{bib:#1#2}\iftrue \else
+      \addcitelist{#1#2}%
+      \opwarning{The cite [#1#2] unknown. Try to TeX me again}\openref
+      \addto\savedcites{?,}\def\sortcitesA{}\lastcitenum=0
+      \expandafter\gdef\csname bib:#1#2\endcsname {}%
       \expandafter \skiptorelax \fi
-   \expandafter \ifx \csname bib:#1\endcsname \empty
-      \docite{}%
+   \expandafter \ifx \csname bib:#1#2\endcsname \empty
+      \addto\savedcites{?,}\def\sortcitesA{}\lastcitenum=0
       \expandafter \skiptorelax \fi
    \def\bibnn##1{}%
-   \if &\csname bib:#1\endcsname
-      \addcitelist{#1}%
+   \if &\csname bib:#1#2\endcsname
+      \addcitelist{#1#2}%
       \def\bibnn##1##2{##1}%
-      \sxdef{bib:#1}{\csname bib:#1\endcsname}%
+      \sxdef{bib:#1#2}{\csname bib:#1#2\endcsname}%
    \fi
-   \docite{\csname bib:#1\endcsname}%
+   \edef\savedcites{\savedcites \csname bib:#1#2\endcsname,}%
    \relax
+   \expandafter\citeA\fi
 }
-\def\printcite#1{\citesep\citelink{#1}\def\citesep{,\hskip.2em\relax}}
-\def\printdashcite#1{\hbox{--}\citelink{#1}}
+\def\printsavedcites{\sortcitesA 
+   \chardef\tmpb=0 \expandafter\citeB\savedcites,%
+   \ifnum\tmpb>0 \printdashcite{\the\tmpb}\fi
+}
+\def\sortcitesA{}
+\def\sortcitations{%
+  \def\sortcitesA{\edef\savedcites{300000,\expandafter}\expandafter\sortcitesB\savedcites,%
+                  \def\tmpa####1300000,{\def\savedcites{####1}}\expandafter\tmpa\savedcites}%
+}
+\def\sortcitesB #1,{\if $#1$%
+  \else
+     \mathchardef\tmpa=#1
+     \edef\savedcites{\expandafter}\expandafter\sortcitesC \savedcites\end
+     \expandafter\sortcitesB 
+  \fi
+}
+\def\sortcitesC#1,{\ifnum\tmpa<#1\edef\tmpa{\the\tmpa,#1}\expandafter\sortcitesD 
+                   \else\edef\savedcites{\savedcites#1,}\expandafter\sortcitesC\fi}
+\def\sortcitesD#1\end{\edef\savedcites{\savedcites\tmpa,#1}}
 
-\def\docite#1{\if$#1$??%
-   \else
+\def\citeB#1,{\if$#1$\else
+   \if?#1\relax??%
+      \else
       \ifnum\lastcitenum=0   % only comma separated list
          \printcite{#1}%
       \else
@@ -1394,29 +1429,48 @@
                \else
                   \printdashcite{\the\tmpb}\printcite{#1}\chardef\tmpb=0
    \fi\fi\fi\fi\fi
+   \expandafter\citeB\fi
 }
 \def\shortcitations{\lastcitenum=1 }
 
-\def\bib[#1]{\par \ifnum\bibnum>0 \bibskip \fi
-   \advance\bibnum by1
-   \wbib{#1}{\the\bibnum}%
-   \hangindent=\iindent
-   \noindent \def\tmpb{#1}\dest[cite:\the\bibnum]%
-   \indent \llap{[\the\bibnum] }\ignorespaces
-}
-\def\wbib#1#2{\edef\tmp{\wref\Xbib{{#1}{#2}}}%
-  \ifx\tmp\empty\else \immediate\tmp \fi
-}
-\def\Xbib#1#2{\sdef{bib:#1}{\bibnn{#2}&}}
+\def\printcite#1{\citesep\citelink{#1}{\citelinkA{#1}}\def\citesep{,\hskip.2em\relax}}
+\def\printdashcite#1{\ifmmode-\else\hbox{--}\fi\citelink{#1}{\citelinkA{#1}}}
+\def\citesep{}
 
-\def\addcitelist#1{\global\addto\citelist{\lcite[#1]}}
+\def\nonumcitations{\lastcitenum=0\def\sortcitesA{}\def\etalchar##1{$^{##1}$}%
+   \def\citelinkA##1{\isdefined{bim:##1}\iftrue \csname bim:##1\endcsname
+      \else ##1\opwarning{\noexpand\nonumcitations + empty bibmark. Maybe bad BibTeX style}\fi}
+}
+\def\citelinkA{}
+
+\def\ecite[#1]{\bgroup\citeA#1,,,\expandafter\eciteB\savedcites;}
+\def\eciteB#1,#2;#3{\if?#1\relax #3\else \citelink{#1}{#3}\fi\egroup}
+
+\def\bib[#1] {\isnextchar={\bibA[#1]}{\bibmark={}\bibB[#1]}}
+\def\bibA[#1]=#2{\bibmark={#2}\bibB[#1]}
+\def\bibB[#1]{\par \ifnum\bibnum>0 \bibskip \fi
+   \advance\bibnum by1
+   \noindent \def\tmpb{#1}\wbib{#1}{\the\bibnum}{\the\bibmark}%
+   \printbib \ignorespaces
+}
+\def\wbib#1#2#3{\dest[cite:\the\bibnum]%
+   \ifx\wref\wrefrelax\else \immediate\wref\Xbib{{#1}{#2}{#3}}\fi}
+
+\def\Xbib#1#2#3{\sdef{bib:#1}{\bibnn{#2}&}\if^#3^\else\sdef{bim:#2}{#3}\fi\def\lastbibnum{#2}}
+
+\def\printbib{\hangindent=\iindent
+   \ifx\citelinkA\empty \noindent\hskip\iindent \llap{[\the\bibnum] }%
+   \else \noindent \fi
+}
+
+\def\addcitelist#1{\global\addto\citelist{\citeI[#1]}}
 \def\writeaux#1{\immediate\write\auxfile{\string\citation{#1}}}
 \def\writeXcite#1{\openref\immediate\wref\Xcite{{#1}}}
 \def\citelist{} \def\citelistB{}
 
 \def\usebibtex#1#2{%
    \openref \openauxfile{#1}{#2}%
-   \def\lcite[##1]{\writeaux{##1}}\citelist
+   \def\citeI[##1]{\writeaux{##1}}\citelist
    \global\let\addcitelist=\writeaux
    \bgroup \readbblfile{\jobname}\egroup
 }
@@ -1434,27 +1488,22 @@
   \else
     \closein\testin
     \bibnum=0
-    \def\begin##1##2{}\def\end##1{}% LaTeX environment
-    \def\newcommand##1 {}%
+    \long\def\begin##1\bibitem{\bibitem}\def\end##1{}% LaTeX environment
     \def\httpAddr##1{\url{http:##1}}\def\\{\hfill\break}%
     \def\newblock{\hskip .11em plus.33em minus.07em}%
-    \def\mbox{\leavevmode\hbox}\let\em=\it
+    \def\mbox{\leavevmode\hbox}\def\emph##1{{\it##1}}%
     \parindent=\iindent \bibtexhook\relax
     \input #1.bbl
     \par
   \fi
 }
-\def\bibitem{\isnextchar[{\bibitemB}{\def\tmpa{}\bibitemC}}
-\def\bibitemB[#1]{\def\tmpa{#1}\bibitemC}
+\def\bibitem{\isnextchar[{\bibitemB}{\bibmark={}\bibitemC}}
+\def\bibitemB[#1]{\bibmark={#1}\bibitemC}
 \def\bibitemC#1{\bibitemD{#1}}
 \def\bibitemD#1{\par\ifnum\bibnum>0 \bibskip \fi
    \advance\bibnum by1
-   \noindent \def\tmpb{#1}\dest[cite:\if$\tmpa$\the\bibnum\else\tmpa\fi]%
-   \hangindent=\parindent 
-   \if$\tmpa$\indent\llap{[\the\bibnum] }\wbib{#1}{\the\bibnum}%
-   \else [\tmpa]\wbib{#1}{\tmpa}\enskip
-   \fi
-   \ignorespaces
+   \noindent \def\tmpb{#1}\wbib{#1}{\the\bibnum}{\the\bibmark}% 
+   \printbib \ignorespaces
 }
 \def\genbbl#1#2{\openauxfile{#1}{#2}%
    \immediate\write\auxfile{\string\citation{*}}%
@@ -1476,7 +1525,7 @@
 \sdef{bbl:a}#1{\bgroup \readbblfile{#1}\egroup}
 
 \sdef{bbl:b}#1{\bgroup
-     \let\lcite=\relax \xdef\citelist{\citelist\citelistB}%
+     \let\citeI=\relax \xdef\citelist{\citelist\citelistB}%
      \def\bibitemC##1 ##2\par{%
         \isinlist\citelist{[##1]}\iftrue \bibitemD{##1}##2\par\fi}%
      \readbblfile{#1}%
@@ -1484,21 +1533,23 @@
   \egroup
 }
 \sdef{bbl:c}#1{\bgroup
-     \let\lcite=\relax \xdef\citelist{\citelist\citelistB}%
+     \ifx\citelinkA\empty \else 
+         \opwarning{\string\nonumcitations: don't use \string\usebbl/c}\fi
+     \let\citeI=\relax \xdef\citelist{\citelist\citelistB}%
      \def\bibitemC##1 ##2\par{%
         \isinlist\citelist{[##1]}\iftrue
-           \ifx\tmpa\empty \sdef{bb:##1}{\bibitemD{##1}##2\par}%
+           \if^\the\bibmark^\sdef{bb:##1}{\bibitemD{##1}##2\par}%
            \else \toks0={##2\par}%
-                 \edef\tmpa{\noexpand\sdef{bb:##1}{% \tmpa have to expand
-                      \noexpand\bibitemB[\tmpa]{##1}\the\toks0}}\tmpa
+                 \edef\tmpa{\noexpand\sdef{bb:##1}{% \the\bibmark have to expand
+                      \noexpand\bibitemB[\the\bibmark]{##1}\the\toks0}}\tmpa
         \fi\fi}%
      \readbblfile{#1}%
      \def\bibitemC##1{\bibitemD{##1}}%
-     \def\lcite[##1]{\csname bb:##1\endcsname}\citelist
+     \def\citeI[##1]{\csname bb:##1\endcsname}\citelist
      \global\let\addcitelist=\writeXcite
   \egroup
 }
-\def\Xcite#1{\addto\citelistB{\lcite[#1]}}
+\def\Xcite#1{\addto\citelistB{\citeI[#1]}}
 
 
 %%%%%%%%%%%%%% output -- sec. 3.24 in opmac-d.pdf
@@ -1513,7 +1564,7 @@
 }
 \def\doprotect#1{\let#1=\relax}
 \addto\begoutput{\def\nl{ }\def\fnote##1{}\def\fnotemark##1{}}
-\def\prepage{\destheight=25pt \dest[pg:\the\pageno]}
+\def\prepage{\def\destheight{25pt}\dest[pg:\the\pageno]}
 
 {\catcode`\@=11
 \gdef\pagecontents{\prepage % dest of pageno
@@ -1656,6 +1707,19 @@ Oct. 2013  /Border .6
            \typobase introduced
            \typoscale[20000/] ``too large dimension'' ... solved 
            \activettchar reimplemented
+Nov. 2013  \Xpage: \ifnum\lastpage=#1 \else inserted
+           \frame is defined as \long
+           multilanuage: cz -> cs changed (by ISO 639-1)
+           \cr -> \crcr in \crl, \crll and \crli
+           \doverbinput: \ifeof\vifile added (bug ``empty line at EOF'' corrected)
+           eTeX support for multilang added.
+Feb. 2014  \sortcitations introduced, internal macros of \cite rewritten
+Mar. 2014  \frame: \setbox0=\hbox{{#1}} in order to \aftergroup in #1
+           \mnote: \pdfsave,\pdfrestore inserted, \mnote colors rewritten
+Apr. 2014  \nonumcitations, \ecite, \printbib, \lastbibnum introduced
+           \wbib, \citelink rewritten (more parameters now)
+           \destheight rewritten as macro, sorry
+           \fnotehook introduced
+Apr. 2014b \nocite[*] bug removed, \insertmark corrected
 
 %%%%%%%%%%%%%% End of opmac.tex
-

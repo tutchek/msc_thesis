@@ -1,0 +1,35 @@
+\newpage
+
+\label[chap:strategies]
+
+\chap Solution strategies
+
+\sec Tabu search
+
+A Tabu search, as presented in (Glover \ecite[Glover1989]{1989}, \ecite[Glover1990a]{1990a} and \ecite[Glover1990]{1990b}), is a solution strategy for solving combinatorial optimization problems. It can be used to solve 
+a wide range of problems from graph theory and matroid settings to general pure and mixed integer programming problems. The combinatorial optimization problem is formulated as follows: 
+
+$${\fam0 Minimize:}\quad c(x): x \in X\quad {\fam0 in}\, R_n,$$
+
+where the function $c(x)$ is a function (linear or non-linear) and the condition $x\in X$ is assumed to constrain the specified components of $x$ to discrete values. The Tabu search itself 
+can be defined as follows:
+
+\begitems \style N
+* Select an initial $x\in X$ and let $x^\hv := x$. Set the iteration counter $k = 0$ and begin with $T$ empty.
+* If $S(x)\setminus T$ is empty, go to Step 4. Otherwise, set $k := k+1$ and select $s_k \in S(x) \setminus T$ such that $s_k(x) = {\rm OPTIMUM}(s(x) : s \in S(x) \setminus T)$.
+* Let $x := s_k(x)$. If $c(x) < c(x^\hv)$, where $x^\hv$ denotes the best solution currently found, let $x^\hv := x$.
+* If a chosen number of iterations has elapsed either in total or since $x^\hv$ was last improved, or if $S(x) \setminus T = \emptyset$ upon reaching this step directly from Step 2, stop.
+Otherwise update $T$ (as subsequently identified) and return to Step 2.
+\enditems
+
+\sec Monte Carlo Tree Search
+
+\cite[Trunda2013]
+
+\sec Branch and bound approach to solve VRP
+
+\cite[Toth2002]
+
+\sec Constraint programming
+
+\cite[Kelareva2013]
