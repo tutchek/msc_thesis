@@ -5,8 +5,7 @@
 %% The history of versions is at the end of this file, after \endpinput
 
 \ifx\OPmacversion\undefined \else \endinput \fi
-\def\OPmacversion{Apr. 2014b}
-
+\def\OPmacversion{May 2014d}
 \immediate\write16{This is OPmac (Olsak's Plain macros), version <\OPmacversion>}
 
 %%%%%%%%%%%%%% Basic macros, sec. 3.1 in opmac-d.pdf
@@ -29,9 +28,7 @@
 \def\sdef#1{\expandafter\def\csname#1\endcsname}
 \def\sxdef#1{\expandafter\xdef\csname#1\endcsname}
 
-\def\adef#1{\catcode`#1=13
-   \bgroup \lccode`\~=`#1\lowercase{\egroup\def~}%
-}
+\def\adef#1{\catcode`#1=13 \bgroup \lccode`\~=`#1\lowercase{\egroup\def~}}
 
 \def\isdefined #1#2{\expandafter\ifx \csname#1\endcsname \relax
      \csname iffalse\expandafter\endcsname
@@ -41,7 +38,7 @@
 }
 \def\isinlist#1#2#3{\def\tmp##1#2##2\end{\def\tmp{##2}%
    \ifx\tmp\empty \csname iffalse\expandafter\endcsname \else
-                  \csname iftrue\expandafter\endcsname \fi}%
+                  \csname iftrue\expandafter\endcsname \fi}% end of \def\tmp
    \expandafter\tmp#1\endlistsep#2\end
 }
 \def\isnextchar#1#2#3{\def\tmpa{#2}\def\tmpb{#3}%
@@ -49,12 +46,17 @@
 }
 \def\isnextcharA{\ifx\tmp\next\expandafter\tmpa\else\expandafter\tmpb\fi}
 
+\def\maybebreak{\afterassignment\maybebreakA\tmpdim=}
+\def\maybebreakA{\ifvmode \vskip0pt plus\tmpdim \penalty-130 \vskip0pt plus-\tmpdim 
+    \else \hskip0pt plus\tmpdim \penalty-130 \hskip0pt plus-\tmpdim \fi \relax
+}
 \def\uv#1{\clqq#1\crqq}
 \let\\=\undefined
 {\lccode`\?=`\%  \lowercase{\gdef\percent{?}}}
 {\lccode`\?=`\\  \lowercase{\gdef\bslash{?}}}
 \def\,{\ifmmode \mskip\thinmuskip \else \thinspace \fi}
 \addprotect\percent \addprotect\bslash \addprotect\, \addprotect\exfont
+
 
 %%%%%%%%%%%%%% Global parameters, sec. 3.2 in opmac-d.pdf
 
@@ -118,7 +120,9 @@
 %%%%%%%%%%%%%% Sizes of fonts and \baselineskip, sec. 3.4 in opmac-d.pdf
 
 \ifx\regfont\undefined
-   \opwarning{csplain version <Nov. 2012> or later is recommended}
+   \ifx\uselanguage\undefined % if this is eplain, the following warning is suppressed
+      \opwarning{csplain version <Nov. 2012> or later is recommended}
+   \fi
    % macros from csplain, file csfontsm.tex:
    \font\tenbi=csbxti10 \def\bi{\tenbi}
    \def\letfont#1#2{\ifx#2=\expandafter\letfont\expandafter#1\else
@@ -235,7 +239,7 @@
 \sdef{lan:5}{cs}  \sdef{lan:15}{cs}  \sdef{lan:115}{cs}
 \sdef{lan:6}{sk}  \sdef{lan:16}{sk}  \sdef{lan:116}{sk}
 
-\ifx\uselanguage\undefined \else \message{OPmac: eTeX detected}
+\ifx\uselanguage\undefined \else \message{OPmac: eplain detected}
   \bgroup
      \uselanguage{czech}  \sxdef{lan:\the\language}{cs}
      \uselanguage{slovak} \sxdef{lan:\the\language}{sk}
@@ -321,7 +325,7 @@
 \def\titfont{\typobase\typoscale[\magstep4/\magstep4]\bf}
 \def\chapfont{\typobase\typoscale[\magstep3/\magstep3]\bfshape}
 \def\secfont{\typobase\typoscale[\magstep2/\magstep2]\bfshape}
-\def\seccfont{\typobase\typoscale[\magstep1/\magstep2]\bfshape}
+\def\seccfont{\typobase\typoscale[\magstep1/\magstep1]\bfshape}
 \def\bfshape{\let\tenit=\tenbi \boldmath \bf}
 
 \newcount\chapnum \newcount\secnum \newcount\seccnum \newcount\nonumnum
@@ -474,15 +478,11 @@
 \def\ii #1 {\leavevmode\def\tmp{#1}\iiA #1,,}
 
 \def\iiA #1,{\if$#1$\else\def\tmpa{#1}%
-   \ifx\tmpa\iiatsign \expandafter\iiB\tmp,,%
-   \else\iindex{#1}\fi
+   \ifx\tmpa\iiatsign \expandafter\iiB\tmp,,\else\iindex{#1}\fi
    \expandafter\iiA\fi}
 \def\iiatsign{@}
 
-\def\iiB #1,{\if$#1$\else
-   \iiC#1/\relax
-   \expandafter\iiB\fi
-}
+\def\iiB #1,{\if$#1$\else \iiC#1/\relax \expandafter\iiB\fi}
 \def\iiC #1/#2\relax{\if$#2$\else\iindex{#2#1}\fi}
 
 \def\iid #1 {\leavevmode\iindex{#1}#1\futurelet\tmp\iiD}
@@ -669,8 +669,7 @@
 \newif \ifAleB
 
 \def\isAleB #1#2{%
-  \edef\tmp{\firstdata#1\empty\relax\firstdata#2\empty\relax%
-            \noexpand#1\noexpand#2}%
+  \edef\tmp{\firstdata#1\empty\relax\firstdata#2\empty\relax \noexpand#1\noexpand#2}%
   \expandafter \testAleB \tmp
 }
 \def\testAleB #1#2\relax #3#4\relax #5#6{%
@@ -933,9 +932,11 @@
 \def\destbox[#1]{\vbox to0pt{\kern-\destheight \pdfdest name{#1} xyz\vss}}
 \def\dest[#1]{}
 
-\def\link[#1:#2]#3#4{\leavevmode\pdfstartlink height.9em depth.3em
+\def\linkactive[#1:#2]#3#4{\leavevmode\pdfstartlink height.9em depth.3em
       \pdfborder{#1} goto name{#1:#2}\relax {#3#4}\pdfendlink
 }
+\def\link[#1]#2#3{#3}
+
 \def\urllink[#1:#2]#3{{\let~=\relax \let\\=\relax \let\{=\relax \let\}=\relax
    \leavevmode\pdfstartlink height.9em depth.3em
    \pdfborder{#1}user{/Subtype/Link/A <</Type/Action/S/URI/URI(#2)>>}\relax
@@ -949,7 +950,7 @@
 \def\urlcolor{}
 
 \def\hyperlinks#1#2{%
-   \let\dest=\destactive
+   \let\dest=\destactive \let\link=\linkactive
    \def\toclink##1{\link[toc:##1]{\localcolor#1}{\toclinkA{##1}}}%
    \def\pglink##1{\link[pg:##1]{\localcolor#1}{##1}}%
    \def\citelink##1##2{\link[cite:##1]{\localcolor#1}{##2}}%
@@ -970,21 +971,22 @@
 \fi
 
 \def\url#1{{\def\tmpb{#1}%
-   \replacestrings{//}{\urlskip\urlslashslash\urlbskip}%
-   \replacestrings{/}{\urlskip/\urlbskip}%
-   \replacestrings{.}{\urlskip.\urlbskip}%
-   \replacestrings{?}{\urlskip?\urlbskip}%
-   \replacestrings{=}{\urlskip=\urlbskip}%
-   \replacestrings{~}{\char`\~ }%
-   \replacestrings{_}{\char`\_ }%
-   \replacestrings{^}{\char`\^ }%
+   \replacestrings{//}{{\urlskip\urlslashslash\urlbskip}}%
+   \replacestrings{/}{{\urlskip/\urlbskip}}%
+   \replacestrings{.}{{\urlskip.\urlbskip}}%
+   \replacestrings{?}{{\urlskip?\urlbskip}}%
+   \replacestrings{=}{{\urlskip=\urlbskip}}%
+   \replacestrings{~}{{\char`\~}}%
+   \replacestrings{_}{{\char`\_}}%
+   \replacestrings{^}{{\char`\^}}%
    \replacestrings{\\}{\bslash}%
-   \replacestrings{\{}{\char`\{ }%
-   \replacestrings{\}}{\char`\} }%
-   \replacestrings{&}{\urlbskip\char`\& \urlskip}%
-   \ulink[#1]{\urlfont\tmpb}%
+   \replacestrings{\{}{{\char`\{}}%
+   \replacestrings{\}}{{\char`\}}}%
+   \replacestrings{&}{{\urlbskip\char`\& \urlskip}}%
+   \def\|{}\ulink[#1]{\urlfont\tmpb}%
 }}
-\def\urlfont{\tt}
+\def\urlfont{\tt \hyphenchar\the\font=-1 \let\|=\urlspecchar}
+\def\urlspecchar{\penalty10 }
 \def\urlskip{\null\nobreak\hskip0pt plus0.05em\relax}
 \def\urlbskip{\penalty100 \hskip0pt plus0.05em\relax}
 \def\urlslashslash{/\urlskip/}
@@ -1184,14 +1186,14 @@
 
 \def\table{\vbox\bgroup \catcode`\|=12 \tableA}
 \def\tableA#1#2{\offinterlineskip \def\tmpa{}\tabdata={}\scantabdata#1\relax
-   \halign\expandafter{\the\tabdata\tabstrutA\cr#2\crcr}\egroup}
+   \halign\expandafter{\the\tabdata\cr#2\crcr}\egroup}
 
 \def\scantabdata#1{\let\next=\scantabdata
    \ifx\relax#1\let\next=\relax
    \else\ifx|#1\addtabvrule
-   \else\expandafter\ifx\csname tabdeclare#1\endcsname \relax
-     \opwarning{tab-declare letter #1 unknown, ignored}%
-        \else\expandafter \addtabitem\expandafter{\csname tabdeclare#1\endcsname}%
+      \else\expandafter\ifx\csname tabdeclare#1\endcsname \relax
+            \opwarning{tab-declare letter #1 unknown, ignored}%
+         \else\expandafter \addtabitem\expandafter{\csname tabdeclare#1\endcsname}%
    \fi\fi\fi \next
 }
 \def\tabdeclarec{\tabiteml\hfil##\unsskip\hfil\tabitemr}
@@ -1200,7 +1202,7 @@
 
 \def\unsskip{\ifdim\lastskip>0pt \unskip\fi}
 \def\addtabitem#1{\ifnum\colnum>0 \addtabdata{&}\addto\ddlinedata{&\dditem}\fi
-    \advance\colnum by1 \let\tmpa=\relax \expandafter\addtabdata\expandafter{#1}}
+    \advance\colnum by1 \let\tmpa=\relax \expandafter\addtabdata\expandafter{#1\tabstrutA}}
 \def\addtabdata#1{\expandafter\tabdata\expandafter{\the\tabdata#1}}
 \def\addtabvrule{\ifx\tmpa\vrule \addtabdata{\kern\vvkern}%
     \ifnum\colnum=0\def\vvleft{\vvitem}\else\addto\ddlinedata{\vvitem}\fi\fi
@@ -1210,7 +1212,7 @@
 \def\crll{\crcr\noalign{\hrule\kern\hhkern\hrule}}
 
 \def\crli{\crcr \omit \gdef\dditem{\omit\tablinefil}\gdef\vvitem{\tabvvline}%
-   \vvleft\tablinefil\ddlinedata\cr}
+   \vvleft\tablinefil\ddlinedata\crcr}
 \def\crlli{\crli\noalign{\kern\hhkern}\crli}
 \def\tablinefil{\leaders\hrule\hfil}
 \def\tabvvline{\vrule\kern\vvkern\vrule}
@@ -1721,5 +1723,12 @@ Apr. 2014  \nonumcitations, \ecite, \printbib, \lastbibnum introduced
            \destheight rewritten as macro, sorry
            \fnotehook introduced
 Apr. 2014b \nocite[*] bug removed, \insertmark corrected
+Apr. 2014c nowarn about old csplain if csplain isn't used
+May  2014  \hyphenchar\urlfont=-1, \urlspecchar introduced
+May  2014b \linkactive introduced (bug fixing)
+May  2014c \maybebreak introduced
+May  2014d \seccfont bug fixed
+           \tabstrut inserted to each column in the \table
+
 
 %%%%%%%%%%%%%% End of opmac.tex

@@ -4,5 +4,397 @@
 
 \chap Problem analysis
 
-...
+\pozn{Zkontrolovano 14.7.}In this chapter, we will discuss the problem outlined in the previous chapter. Our goal is to describe the process in such a way to be able to formulate a formalization out of it. The analysis
+is based on a real situation in a retail store company called Sunnysoft, which uses an ERP software Helios.
+
+\sec Description of a problem
+
+For a retail store company, it is important to have the goods distributed evenly across its stores. This requirement is met easily when a particular item is sold in large amounts. In this case, the item
+is usually available in high quantities and can be spread to the company's stores. However, when the item is sold rarely (or the distributor cannot deliver it in desired amounts), its stock supply cannot cover all of the stores sufficiently. In such a case, the goods should be stocked in a store where it gets sold the most. Simultaneously, the store should allow a quick relocation of the goods to another store if needed.
+
+\begfigure
+\centerline{\inspic figs/sklady-1.pdf }\nobreak\medskip
+\label[fig:stores]\caption/f A situation in the retail store company Sunnysoft. The points represent stores and the lines show possible routes of the goods between the stores. The dashed line represents a route operated by a messenger and normal lines represent a route operated by a regular delivery company.
+\endfigure
+
+The stores do not need to be fully interconnected. As we can see in figure \ref[fig:stores], there are no links between Brno and Plzeň. The company uses external delivery company which offers
+a special price for an often used delivery route. As there is a lower transfer rate between peripheral branches, it is possible to send the goods through other branches (in this particular case, 
+through headquarters in Prague). Moreover, some branches which are close to each other can be used by a messenger travelling between the branches more often (in our case it is between the branches located
+in Prague).
+
+\label[secc:analysis:process-driven]
+\secc Process driven by documents
+
+Processes related to goods handling are controlled by documents stored in the ERP system. There are several types of these documents. The relevant ones for us are the following:
+\pozn{shipment order = expediční příkaz, picking list = výdejka, warehouse receipt = příjemka}{\em shipment order}, {\em picking list} and {\em warehouse 
+receipt}. The shipment order is a document ordering the store to deliver an item from a warehouse. The picking list is a document which proves that the item was delivered from the warehouse. Finally,
+the warehouse receipt is a document which proves that the item was put to the store. Documents can be related to one another. Typically, there is a following sequence {\em order} $\rightarrow$ {\em shipment order} 
+$\rightarrow$ {\em picking list} $\rightarrow$ {\em invoice} in case the order is made by a customer and a different sequence {\em shipment order in store 1} $\rightarrow$ {\em picking list in store 1} $\rightarrow$
+{\em warehouse receipt in store 2} in case the goods are transferred from one store another. The picking lists and the warehouse receipts can be either unrealised or realised. The document is in effect 
+(and is unchangeable) after its realisation. Such a document cannot be cancelled or
+deleted. If there is a need to revert the document, an opposite document has to be created and realised. For each item and each store, the ERP system stores a number representing the amount of pieces in the store. Let us call it {\em InStock}. The {\em InStock} gets updated by the realised picking lists and the realised warehouse receipts. Schematically, it can be expressed as follows:
+
+$$InStock_{g,s} = \sum_{wr \in rWR_s}{\left( \mathbox{\# of items of $g$ on $wr$}  \right)} - \sum_{pl \in rPL_s}{\left(\mathbox{\# of items of $g$ on $pl$}\right)},$$
+
+\noindent where $g$ is a particular commodity, $s$ is a particular store, $rWR_s$ is a set of realised warehouse receipts in the store $s$ and $rPL_s$ is a set of realised picking lists in the store $s$. 
+The store operators are responsible for any differences created in the amounts of goods between {\em InStock} and the real amount. Therefore, we may assume that this number is valid and there is no need to 
+prepare a backup plan in regards to a situation where there is a missing item.
+
+As we discussed in the previous paragraph, the ERP contains an information about the amount of stocked items in the store. However, this number is not useable in most situations, for the goods can be 
+unavailable even when it is physically present in the store. Some of the articles can be reserved for a customer, others could be planned for transfer to another store. Such a reservation
+is performed with shipment orders. We define a variable {\em Availability} as follows:
+
+$$Availability_{g,s} = InStock_{g,s} - \sum_{so \in SO_s}{\left( \mathbox{\# of unhandled items of $g$ on $so$} \right)},$$
+
+\noindent where $g$ and $s$ have the same meaning as mentioned above and $SO_s$ is a set of shipment orders in the store $s$. As we can see, the availability can be negative, i.e. the demand for an article might be larger 
+than the amount on that particular store and therefore, the article needs to be transferred from another store or ordered from the supplier.
+
+This model has one disadvantage, which can lead to the irregularity described in section \ref[sec:analysis:queue-jumping]. Since the ERP system only stores the amount of goods in a store, the amount
+of available goods and the list of shipment orders, there is no clear relation between the reserved item and the shipment order. Sometimes, the shipment orders cannot be processed in the order of their 
+creation. They could contain another article, which is not available. Therefore, the shipment orders are processed out of their order. Fortunately, there is a way to estimate whether we are able to at least partially
+process the shipment order -- we must order the unhandled shipment orders and check, if there is at most $(InStock - 1)$ items on the previous shipment orders.\fnote{In the real application
+the ERP has an extension column, where it is possible to find this characteristic -- ``can be processed", ``can be processed partially" and ``cannot be processed" -- precomputed with the database triggers. The operators have 
+the ERP preconfigured to show only the shipment orders, which can be at least partially processed.}
+
+
+\label[secc:analysis:low-priority]
+\secc Balancing of goods and low-priority transfers
+
+As we described in section \ref[secc:analysis:process-driven], we can detect the missing goods in order to plan their transfer from another store. However, such a transfer is very often planned with
+small amounts of transferred goods. Therefore, we need some heuristics to estimate the need for a particular article in a given store and plan the transfer accordingly to this estimation. However,
+these transfers are different from transfers dealing with negative $Availability$ (we will call them ``covering transfers", since they cover the missing items). The covering transfers must be processed as
+soon as possible for they indicate that there is a customer waiting for that particular item. The other transfers can be postponed (especially in the case of a store outage described in section 
+\ref[secc:analysis:outage]) and will be handled after the covering transfers are processed. Thus, we introduce a label ``low-priority transfer" for a transfer, which does not necessarily need to be processed immediately.
+
+\secc The goods ``on the way"
+
+As described in section \ref[secc:analysis:process-driven], the amount of goods in a particular store can be described using the variables $InStock$ and $Availability$. Unfortunately, this does not
+cover all the situations. When an article is sent to another store, it is delivered from a default store but not stocked to its destination store, since there is a realised picking list, but no
+corresponding realised warehouse receipt. Such goods is marked for the ERP system as ``in a void". Nevertheless, we can detect such goods by inspecting the unrealised warehouse receipts. If such a receipt is found and has a corresponding realised picking list, it means that there is goods on the way.
+
+It is important to keep track of the goods on the way, for the store can have a negative {\em Availability} but there might be a transfer planned, which could have been already handled by a certain previous action.
+Therefore we can introduce a variable $OnTheWay$ with following definition:
+
+$$ OnTheWay_{g,s} = \sum_{wr \in utWR_s}{\left( \mathbox{\# of items of $g$ on $wr$}  \right)},$$
+
+\noindent where the $g$ and $s$ have the same meaning as above and $utWR_s$ is a set of unrealised warehouse receipts with corresponding realised picking lists (unrealised transfer warehouse receipts) in store
+$s$. The corresponding picking lists are from different stores than the warehouse receipts.
+
+It is useful to count with the planned transfer shipment orders. The amount of the goods in such orders is added to the $OnTheWay$ variable. Therefore, we define a $OnTheWay^{*}$ as follows:
+
+$$OnTheWay^{*}_{g,s} = OnTheWay_{g,s} + \sum_{so \in tSO_s}{\mathbox{(\# of unhandled items of $g$ on $so$)}},$$
+
+\noindent where the $g$ and $s$ have the same meaning as above and $tSO_s$ is a set of transfer shipment orders from other stores to store $s$. We exclude the transfer shipment orders for the low priority transfers
+described in section \ref[secc:analysis:low-priority]. Since these orders are low-priority, there is no guarantee, that the goods will be dispatched in a reasonable period of time.\fnote{In a real 
+situation, we experienced that some stores stopped handling the low-priority transfers at all, since there was an outage of workers. However, the system expected the transfers to be processed so it
+did not plan any new transfers (not even the high-priority ones) for the affected goods.} 
+
+With this variable, we can slightly modify the previously defined {\em Availability} and define a variable $Availability^{*}$, which contains the current availability of a particular article in a store
+with an increase expected in a few days:
+
+$$Availability^{*}_{g,s} = Availability_{g,s} + OnTheWay^{*}_{g,s}$$
+
+There is no need to transfer the goods to the store, if the $Availability^{*}$ is non-negative. However, we cannot use this variable while planning a transfer to another store, because the goods is 
+not present physically.
+
+\label[sec:analysis:pickup]
+\secc Pick-up and delivery of items
+
+The goods planned for a transfer are periodically sent to its destination branch. Although, this action cannot be performed continuously as the delivery company stops for a pick-up of the goods only once
+in a while. The transfers are therefore performed in batches that are planned on regular bases, which gives us the possibility of creating a schedule out of them. Moreover, for each pair of stores together with a delivery 
+type, we have an estimated duration (usually in working days) of the delivery together with the delivery time for the destination store. Ergo, we can compute the shortest path (in time units) for the goods from
+all stores to the store where the goods is missing (i.e. $Availability^{*} < 0$).
+
+\label[sec:analysis:irregularities]
+\sec Irregularities
+
+The previously described process has some irregularities in the real world, which makes the problem harder to solve. The two most problematic scenarios are  -- queue jumping and storehouse outage.
+These irregularities can compromise the whole process and therefore we will pay more attention to them.
+
+\label[sec:analysis:queue-jumping]
+\secc Queue jumping
+
+When an item is ordered by a customer or when it is planned for a relocation, it is blocked by a shipment order and is no longer available. However, sometimes a salesman does not respect the blocking and
+sells the goods despite its being blocked. The reason for such an action can vary and in fact is not important for our purposes, but the outcome is the same. Either there is a customer whose order was
+not processed in time or there is a planned transfer of goods which cannot be processed because the goods is no longer available in that store.
+
+This is a result of a combined system where the inputs are generated either by computers or by humans. Since it cannot be avoided, the system should be able to handle such situations. If there is a planned 
+low-priority transfer as described in section \ref[secc:analysis:low-priority], the transfer can be cancelled and the item that was to be transferred can replace the missing goods. If there is no such 
+goods available, the system should plan a transfer from another store, where the item is available.
+
+\label[secc:analysis:outage]
+\secc Storehouse outage
+
+Stores cannot be always open and operational, since they are tended to by human operators. A state, when the store is not open nor operational or even overloaded, is called a store outage. 
+There are several recurring outages -- weekends and state holidays. Sometimes there is an outage caused by an absence of the operator (leave or illness) and sometimes there is another reason for the
+outage such as a stock take\pozn{stock take = inventura}. Generally, there are two types of outages -- 1) closed store, 2) overloaded store. 
+
+In the first case, the store cannot receive nor send any goods to another branch. Therefore, it does not make sense to send there any items or plan transfers from that store. A planned outage we can 
+take into an account, but with an unplanned outage we have to perform a certain action, for example cancel the planned transfers and plan the transfer from another store.
+
+In the latter case, the store can receive and send goods marked for high-priority transfers (i.e. the transfers dealing with the negative $Availability$ on a store), but will most probably not process the
+low-priority transfers.
+
+\sec Currently used algorithms
+
+In this section we will describe the algorithms, which are currently used by the retail company Sunnysoft to solve the problem.
+
+The whole process is directed by documents in the ERP system. The system will first get information from the ERP system, plan new transfers and produce new documents to the ERP system. 
+The basic schema of the algorithm is shown on the Figure \ref[fig:algorithm:basic-schema].
+
+\begfigure
+\centerline{\inspic figs/algorithm-basic-schema-1.pdf }\nobreak\medskip
+\label[fig:algorithm:basic-schema]\caption/f Basic schema of the algorithm
+\endfigure
+
+In general, the algorithms perform the following steps:
+
+\begitems \style N
+* The algorithm loads data from the ERP. It gets the information about pending transfers, availability of goods and demands for goods 
+* Afterwards, it receives demands from an external software system responsible for balancing the goods on stores.
+* Then, the algorithm will plan the transfers of goods to meet the requirements.
+* Finally, the algorithm generates or alters the documents in ERP to perform plans generated in the Step 3.
+\enditems
+
+The algorithm must be able to handle the irregularities described in section \ref[sec:analysis:irregularities]. Some of the irregularities can be resolved easily. If the goods is missing due to
+queue jumping and it is available in a different store, we can cancel the planned transfer and plan the transfer from a different store.
+
+\secc Delivery time
+
+For the purposes of proper planning, we need to estimate a duration of planned transfers. After the algorithm creates a shipment order, an employee must process it. They must search for the demanded goods
+in the store, pack it and hand it over to a delivery company. As described in section \ref[sec:analysis:pickup], the delivery company stops only once in a while. If the goods is not prepared in time for
+the pick-up, it will be handed over on the next pick-up. To compute a delivery time, we use the algorithm \ref[alg:algorithm:delivery-time].
+
+\begfigure
+\begalgo
+\+{\bf function} \uppercase{delivery--time}($path$, $time$)\cr
+\+\kern2cm{\bf returns} a delivery time after transferring goods along the path\cr
+\+\quad\cleartabs&\bf variables: &$path$\hbox to2em{\dotfill}&a sequence of stores $s$ from the origin store $s_0$ to the\cr
+\+               &            &        &destination store $s_n$.\cr
+\+               &            &$time$\dotfill&a shipment time\cr
+\+               &            &$T$\dotfill&a computed total time, initially zero\cr
+\+               &                               &$s$\dotfill&currently examined store\cr
+\+               &                               &$s'$\dotfill&temporary variable containing\cr
+\+               &                               &                &a next store on the path\cr
+\+\cr
+\penalty-100
+\+               &$T\leftarrow time$\cr
+\+               &$s\leftarrow$ first store on $path$\cr
+\+               &{\bf while} $s\neq \mathbox{last store on } path$ {\bf do:}\cr
+\+               &\quad\cleartabs&$s'\leftarrow \mathbox{next store on $path$ after $s$}$\cr
+\label[alg:algorithm:delivery-time:a1]
+\+               &               &$T\leftarrow T + \mathbox{time needed to prepare shipment in $s$ at $T$}$\cr
+\+               &               &$T\leftarrow \mathbox{next pick-up time at $s$ in direction to $s'$ after $T$}$\cr
+\label[alg:algorithm:delivery-time:a2]
+\+               &               &$T\leftarrow T + \mathbox{transport duration from $s$ to $s'$ at $T$}$\cr
+\+               &               &$T\leftarrow \mathbox{next delivery time at $s'$ in direction from $s$ after $T$}$\cr
+\label[alg:algorithm:delivery-time:a3]
+\+               &               &$T\leftarrow T + \mathbox{time needed to recieve shipment in $s'$ at $T$}$\cr
+\+               &               &$s\leftarrow s'$\cr
+\+               &\bf end while\cr
+\+\cr
+\+               &\bf return $T$\cr
+\endalgo\nobreak\medskip
+\label[alg:algorithm:delivery-time]\caption/a Algorithm for computing the delivery time 
+\endfigure
+
+The delivery companies as well as stores do not operate during weekends and public holidays. The algorithm \ref[alg:algorithm:delivery-time] take into account this condition on the lines 
+\ref[alg:algorithm:delivery-time:a1], \ref[alg:algorithm:delivery-time:a2] and \ref[alg:algorithm:delivery-time:a3], since the prolongation is included in the delivery time and time
+needed to prepare and receive a shipment.
+
+\label[sec:algorithm:queue-jumping]
+\secc Recovering from the queue jumping
+
+When a salesman jumps the queue, they remove an item reserved for a certain customer or planned for a transfer. Therefore, we must recover from a situation when the transfer is planned but there
+is no goods available. First, we must detect whether there was any goods planned for a transfer but is currently unavailable and perform a specific action. Thus, we check all goods on unresolved shipment orders using
+the algorithm \ref[alg:algorithm:is-available].
+
+\begfigure
+\begalgo
+\+{\bf function} \uppercase{SO--available}($shipment\_order$, $commodity$) \cr
+\+\kern2cm{\bf returns} \cleartabs&available amount of $commodity$ on $shipment\_order$\cr
+\+\cr
+\+\quad\cleartabs&\bf variables: &$shipment\_order$\algfill\cleartabs&a shipment order to be checked\cr
+\+               &            &$commodity$\dotfill&a type of goods\cr
+\+               &               &$s$\dotfill&a store related to $shipment\_order$\cr
+\+               &                               &$onStock$\dotfill&amount of $commodity$ present at $s$\cr
+\+               &                               &$ordered$\dotfill&amount of $commodity$ on $shipment\_order$\cr
+\+               &                               &$blocked$\dotfill&amount of $commodity$ blocked by\cr
+\+               &                               &                     &previous shipment orders\cr
+\+               &                               &$available$\dotfill&amount of $commodity$ available at $s$, \cr
+\+\cr
+\+               &$s \leftarrow \mathbox{get store from $shipment\_order$}$\cr
+\+               &$onStock \leftarrow \mathbox{amount of $goods$ on stock at $s$}$\cr
+\+               &$ordered \leftarrow \mathbox{amount of $goods$ on $shipment\_order$}$\cr
+\+               &$blocked \leftarrow $\cleartabs&$\mathbox{amount of $goods$ on shipment orders}$\cr
+\+               &                              &$\mathbox{older than $shipment\_order$ at $s$}$\cr
+\+               &$available \leftarrow onStock - blocked$\cr
+\+\cr
+\+               &{\bf if} $available \leq 0$ {\bf then}\cr
+\+               &\quad\cleartabs&{\bf return} 0\cr
+\+               &{\bf else if} $available \geq ordered$ {\bf then}\cr
+\+               &&{\bf return} $ordered$\cr
+\+               &{\bf else}\cr
+\+               &&{\bf return} $available$\cr
+\+               &{\bf end if}\cr
+\endalgo\nobreak\medskip
+\label[alg:algorithm:is-available]\caption/a Algorithm computing the available amount of goods for a given shipment order.
+\endfigure
+
+If the amount of available items is smaller than the ordered amount, the shipment order cannot be processed. We could send the missing goods from another store, if available, but it is not effective since
+it would be better to transfer it from the store directly to a destination store of the shipment order. Therefore, the shipment order should be at least partially cancelled. This situation can be 
+handled in two different ways. The simple solution is to do nothing. The transfer order was generated due to a demand from some other store. Therefore, if the demand is still valid it will be executed in the next 
+run of the planning algorithm, if possible. Even though the original demand is delayed, at least it will be processed sometime in the future and will not wait until the goods will be replenished.
+
+The second option to solve the missing goods is to rearrange other planned transfers which were set after the affected shipment order. Unfortunately, we cannot simply change the destination of a transfer.
+Each document is identified by series of documents and a sequence number which are unchangeable. The serie number carries an information about the type of the document. Moreover, in case of transport shipment
+orders, each serie is assigned to a pair of stores; the original and the destinated store. Therefore, we need to create a new document instead of changing the original one. However, this would not solve the 
+problem since the shipment orders are processed in the order of their creation. As a result, we refuse this solution.
+
+\secc Recovering from the store outage
+
+When a store outage occurs, the respective store cannot send or receive goods. In case of planned outages, they can be taken into account in the algorithm \ref[alg:algorithm:delivery-time] for new
+transfers, since it is the same situation as weekends or public holidays. However, we still need to handle unprocessed transfers planned before the outage. If we are able to estimate a duration of the outage,
+we can check if it is possible to transfer the goods from another store faster. In such a case, we will cancel the shipment order in the outaged store and place a new shipment order in the other store. Nothing, however, can be done concerning other situations. If we do not know the estimated duration of the outage, we can use a predefined universal duration (e.g. two weeks) or we can simply deal with the situation in the same way as in the case 
+of queue jumping described in section \ref[sec:algorithm:queue-jumping], because the goods on the shipment order is effectively missing.
+
+\label[secc:analysis:naive]
+\secc Na\"{\i}ve algorithm
+
+In this section, we will describe a na\"{\i}ve algorithm for automated logistics. This algorithm only covers the current insufficiency in stores and does not respect an order of 
+precedence of shipment orders. However, this approach is still reasonable if there is enough goods in other stores and if we run the algorithm regularly. Since we run it often,
+we process demands in batches and we maintain the order of precedence implicitly.
+
+For each type of goods, the algorithm divides stores into two groups according to the available amount of the goods. The first group of stores $S$ (source stores) contains stores where 
+the available amount of goods is positive. The second group of stores $D$ (destination stores) contains stores where the available amount of goods is negative.
+
+The algorithm uses a predefined constant for each store representing its sales strength (a number of sales in a given time period). The algorithm sorts $D$ according to the sales 
+strength in a descending order. Thus firstly, it satisfies the strongest store. Then, it searches for the fastest transfer from a store in $D$. The algorithm is listed in detail as an 
+algorithm \ref[alg:algorithm:naive].
+
+\begfigure
+\begalgo
+\+{\bf function} \uppercase{plan--transfers--naive}($commodity$, $stores$, $strengths$)\cleartabs&\cr
+\+\cr
+\+\quad\cleartabs&{\bf variables:} \cleartabs&$commodity$\algfill&a type of goods\cr
+\+               &                           &$stores$\dotfill&a set of stores\cr
+\+               &                           &$strengths$\dotfill&a set of sales strengths for each store\cr
+\+               &                           &$Availability_s$\dotfill&availability of $commodity$ in store $s$\cr
+\+               &                                 &$Availability^*_s$\dotfill&availability of $commodity$ in store $s$\cr
+\+               &                                 &                              &including goods on the way\cr
+\+               &                                 &$S$\dotfill&a set of source stores\cr
+\+               &                                 &$D$\dotfill&a set of destination stores\cr
+\+               &                                 &$s_s,s_d$\dotfill&source and destination stores\cr
+\+               &                                 &$missing$\dotfill&a current amount of missing items\cr
+\+               &                                 &                     &of $commodity$\cr
+\+               &                                 &$toTransfer$, an amount of $commodity$ to be transferred\cr
+\+\cr
+\+               &$S \leftarrow \{s_s | s \in stores, Availability_{s_s} > 0\}$\cr
+\+               &$D \leftarrow \{s_d | s\in stoes, Availability^*_{s_d} < 0\}$\cr
+\+               &sort $D$ by $strengths$ in descending order\cr
+\+               &{\bf for each} store $s_d\in D$ {\bf do:}\cr
+\+               &\quad\cleartabs&{\bf while} $Availability^*_{s_d} < 0$ {\bf do:}\cr
+\+               &               &\quad\cleartabs&$s_s\leftarrow \mathbox{origin of }\left(\argmin_{path \mathbox{ from } S \mathbox{ to } s_d}\left\{\mathbox{\uppercase{delivery--time}}(path, now)\right\}\right)$\cr
+\+               &               &               &{\bf if} $s_s = null$ {\bf then}\cr
+\+               &               &               &\quad\cleartabs&{\bf break while}\cr
+\+               &               &               &{\bf end if}\cr
+\+               &               &               &$missing \leftarrow - Availability^*_{s_d}$\cr
+\+               &               &               &$toTransfer \leftarrow \min{\{missing, Availability_{s_s} \}}$\cr
+\+               &               &               &\uppercase{plan-transfer}$(commodity, s_s, s_d, toTransfer)$\cr
+\+               &               &               &$Availability^*_{s_d} \leftarrow Availability^*_{s_d} + toTransfer$\cr
+\+               &               &               &$Availability_{s_s} \leftarrow Availability_{s_s} - toTransfer$\cr
+\+               &               &{\bf end while}\cr
+\+               &{\bf end for}\cr
+\endalgo\nobreak\medskip
+\label[alg:algorithm:naive]\caption/a Na\"{\i}ve algorithm for automated logistics.
+\endfigure
+
+\label[secc:analysis:ford-fulkerson]
+\secc Ford--Fulkerson based algorithm
+
+The other algorithm was used before the Na\"{\i}ve algorithm and is based on Ford--Fulkerson algorithm described in \cite[Ford1956]. For months, it was tested in real situations and it proved to be good. However,
+the Na\"{\i}ve algorithm is used nowadays for its simplicity.
+
+The Ford--Fulkerson finds the maximum flow in a given network. It searches for augmenting paths from the source to the sink of the network. An augmenting path is a path where all of its 
+edges are not fully saturated. Thus, we can increase the flow through the network along the path. The new flow cannot exceed the capacity of any edges on the path.
+
+For each type of goods, we construct a bipartite graph $G=(V,E)$ consisting of a set of source stores $S$ and a set of destination stores $D$. Moreover, we add dummy nodes ${\bf 0}$ and ${\bf 1}$ 
+representing the source and the sink of the network.
+
+$$V = S \cup D \cup \{{\bf 0},{\bf 1}\}$$
+
+$$S \cap D = \emptyset, {\bf 0} \not\in S\cup D, {\bf 1} \not\in S \cup D$$
+
+For each possible delivery route between the stores $s_s \in S$ and $s_d \in D$ there is an edge $(s_s, s_d) \in E$ with an unlimited capacity. Finally, for each node $s_s \in S$ there is an edge 
+$(0,s_s)\in E$ with capacity representing the amount of available goods in store $s_s$. Similarly, for each node $s_d \in D$ there is an edge $(s_d,1) \in E$ with capacity representing the
+demanded amount of goods in store $s_d$. We allow only integer flows.
+
+\begfigure
+\centerline{\inspic figs/algorithm-ford-fulkerson-1.pdf }\nobreak\medskip
+\label[fig:algorithm:ford-fulkerson]\caption/f A bipartite graph construed for the Ford--Fulkerson based algorithm. There are five stores $s_n$ with the amount of available goods $a_n$ and the demanded amount
+$d_n$. The augmenting path $({\bf 0}, s_2, s_4, {\bf 1})$ is highlighted.
+\endfigure
+
+As we mentioned earlier, the Ford--Fulkerson algorithm finds the maximum flow by placing augmenting paths until no other path can be placed without violating the capacity 
+constraints. We will generate shipment orders from the generated augmenting paths. Each path from $s_s$ to $s_d$ with a flow $f$ is transformed to a shipment order for a transfer 
+of $f$ items of goods from store $s_s$ to store $s_d$, if $s_s \neq s_d$.
+
+The key part of the algorithm is an order in which the augmenting paths are tested and placed. First, we will extract tuples $(amount, store, date)$ from all unresolved shipment orders and sort them
+according to their $date$ in the ascending order (the oldest first).
+
+We will sort all unresolved shipment orders by their date of creation in the ascending order. Unresolved shipment order will be detected with the algorithm \ref[alg:algorithm:is-available]. 
+Next, we will process the tuples in their order and try to place the augmenting paths. For each tuple, we generate feasible paths in a graph and select the path with the earliest delivery time (algorithm 
+\ref[alg:algorithm:delivery-time]).
+
+\bigskip
+\begalgo
+\+{\bf function} \uppercase{plan--transfers-ff}($commodity$, $stores$)\cr
+\+\cr
+\+\quad\cleartabs&{\bf variables:} \cleartabs&$commodity$\hbox to4em{\dotfill}&a type of goods\cr
+\+               &                           &$stores$\dotfill&a set of stores\cr
+\+               &                           &$shipment\_orders$\dotfill&a set of shipment orders\cr
+\+               &                           &$V$\dotfill&a set of nodes of a construed graph\cr
+\+               &                           &$E$\dotfill&a set of edges of a construed graph\cr
+\+               &                           &$cap$\dotfill&a capacity function of a construed graph\cr
+\+               &                           &$so$\dotfill&one particular shipment order\cr
+\+               &                           &$s, s'$\dotfill&stores\cr
+\+               &                           &$amount$\dotfill&an amount of $commodity$ on\cr
+\+               &                           &                &a shipment order\cr
+\+               &                           &$i$\dotfill&a dummy iteration variable\cr
+\+               &                           &$paths$\dotfill&a set of paths\cr
+\+               &                           &$p$\dotfill&one particular path consisting of\cr
+\+               &                           &           &nodes $p_1$, ..., $p_n$\cr
+\+\cr
+\+               &$shipment\_orders \leftarrow $ \cleartabs&unresolved shipment orders containing $commodity$\cr
+\+               &                                         &not generated by automated logistics\cr
+\+               &sort $shipment\_orders$ by date of creation in ascending order\cr
+\+               &$V \leftarrow \left(stores \times \{s,d\}\right) \cup \{{\bf 0},{\bf 1}\}$\cr
+\+               &$E \leftarrow \emptyset$\cr
+\+               &{\bf for each} $s \in stores$ {\bf do:}\cr
+\+               &\cleartabs\quad&$E \leftarrow E \cup \{({\bf 0},s_s), (s_d, {\bf 1})\}$\cr
+\+               &               &$cap({\bf 0}, s_s) \equiv \max\{0, Availability_s\}$\cr
+\+               &               &$cap(s_d, {\bf 1}) \equiv \max\{0, -Availability^*_s\}$\cr
+\+               &               &{\bf for each} $s' \in stores$ {do:}\cr
+\+               &               &\quad\cleartabs&$E\leftarrow E\cup\{(s_s,{s'}_d)\}$\cr 
+\+               &               &\quad\cleartabs&$cap(s_s,{s'}_d)\equiv \infty$\cr 
+\+               &               &{\bf end for}\cr
+\+               &{\bf end for}\cr
+\+               &{\bf for each} $so \in shipment\_orders$ {\bf do:}\cr
+\+               &\cleartabs\quad&$s \leftarrow $ store from $so$\cr
+\+               &               &$amount \leftarrow$ amount of $commodity$ on $so$\cr
+\+               &               &{\bf for} $i$ = 1 {\bf up to} $amount$ {\bf do:}\cr
+\+               &               &\quad\cleartabs&$paths \leftarrow \{({\bf 0}, s_s, s, {\bf 1}) | cap({\bf 0}, s_s) > 0 \wedge cap(s_s, s) > 0 \wedge cap(s, {\bf 1}) > 0\}$\cr
+\+               &               &               &{\bf if} $paths = \emptyset$ {\bf then}\cr
+\+               &               &               &\quad\cleartabs&{\bf break}\cr
+\+               &               &               &{\bf end if}\cr
+\+               &               &               &$p\leftarrow \argmin_{p \in paths}\left\{\mathbox{\uppercase{delivery--time}}(p, now)\right\}$\cr 
+\medskip
+\+               &               &               &\uppercase{plan-transfer}$(commodity, p_2, s, 1)$\cr
+\+               &               &               &$cap({\bf 0}, p_2) \equiv cap({\bf 0}, p_2)-1$\cr
+\+               &               &               &$cap(p_2, p_3) \equiv cap(p_2, p_3)-1$\cr
+\+               &               &               &$cap(p_3, {\bf 1}) \equiv cap(p_3, {\bf 1})-1$\cr
+\+               &               &{\bf end for}\cr
+\+               &{\bf end for}\cr
+\endalgo\nobreak\medskip
+\label[alg:algorithm:ford-fulkerson]\caption/a Ford-Fulkerson based algorithm. We denote a pair $(s,x)$ as $s_x$.
 

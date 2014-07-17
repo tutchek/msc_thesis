@@ -1,5 +1,21 @@
 \newpage
 
-\chap Conclusion
+\label[chap:conclusion]
+\chap Conclusions
 
+\pozn{Zkontrolovano 15.7.}In this thesis, we dealt with a real problem of a retail company Sunnysoft. First, we analysed the problem and discussed the currently used approaches to solve it. Afterwards, we reviewed existing 
+models and solution strategies. From these techniques, we chose the CSP based approach and proposed a model based on a path-based model used in planning of data transfers in distributed computing.
+We adapted this technique to the conditions of the solved problem and tested it on a simulation system, prepared for this purpose. The results showed us that ...\pozn{Něco nám ukážou :)}..
+
+\sec Future work
+
+In this thesis we proposed a model based on constraint satisfaction problem. However, the problem could be formulated as well as a mixed integer programming problem (MIP\glos{MIP}{Mixed integer 
+programming problem}). The MIP solvers are in certain cases more effective than CSP solvers \cite[Carsten1995]. Therefore, we should try to formulate the model as a MIP problem and compare it with the
+model discussed in this thesis.
+
+Moreover, the planning of transfers is only one half of the whole problem. The second one is a prediction of the future needs. We use in this thesis a black-box generator of low-priority demands, which
+allows us to balance the good amounts in stores. However, this black-box in real use nowadays uses a hard-wired heuristics defined by the products department. Currently, the company has information
+about the history of sales stored in ERP. Moreover, the company can use information from other sources like price comparing websites. For example, the site Heureka.cz provides information about the price
+range of a particular goods in other companies. Based on these data, we can build a prediction software, which can be used both for optimal allocation of goods as well as for generating orders for goods
+from suppliers.
 

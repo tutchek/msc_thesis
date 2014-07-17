@@ -1,6 +1,9 @@
-\input cs-adventor
+% \input cs-adventor
 \input cs-pagella
+
+
 \ifx\font\corkencoded \def\tmp{ec}\else\def\tmp{cs}\fi
+
 \font\tenss   =\tmp-qhvr  \sizespec
 \font\tenssi  =\tmp-qhvri \sizespec
 \font\tenssb  =\tmp-qhvb  \sizespec
@@ -8,10 +11,10 @@
 \regfont\tenss \regfont\tenssi \regfont\tenssb \regfont\tenssbi
 \regfont\tenbfc
 \def\ss{\tenss\thefontscale[900]} \def\ssi{\tenssi\thefontscale[900]}
-\def\tt{\tentt\thefontscale[1050]}
+%\def\tt{\tentt\thefontscale[1050]}
 \font\thumbbf=\tmp-qagb \sizespec
 
-\def\"#1{{\accent"7F #1}}
+
 
 \letfont\fourteenrm=\tenrm at14pt
 \letfont\sixteenrm=\tenrm at16pt
@@ -19,6 +22,13 @@
 \letfont\fourteenbf=\tenbf at14pt
 \letfont\sixteenbf=\tenbf at16pt
 \letfont\eighteenbf=\tenbf at18pt
+\letfont\poznfont=\tensl at9pt
+%\letfont\male=\tenrm at9pt
+\letfont\male=\tenrm at10pt
+
+%\regfont\sevenrm
+\typosize[12/15]
+\letfont\sevenrm=\sevenrm at8.4pt
 
 \def\headrule{\leaders\hrule height3pt depth-2.6pt\hfil}
 \def\zahlavi{\relax}
@@ -27,8 +37,13 @@
 \newtoks\title
 \title={}
 
-\nonumcitations 
-\def\cite[#1]{(\rcite[#1])}
+% \setmathfamily 8 \tenbf
+
+\newfam\tucnefam
+\setmathfamily \bffam \tenbf
+\setmathfamily \bifam \tenbi
+%\chardef\bffam \tucnefam
+
 
 \runningfnotes
 \def\thefnote{$^{\locfnum}$}
@@ -45,4 +60,145 @@
 \def\hv{\char`\*}
 
 
+\def\mathbox #1{{\mathchoice{\mB\textfont{#1}}{\mB\textfont{#1}}
+ {\mB\scriptfont{#1}}{\mB\scriptscriptfont{#1}}}}
+ \def\mB #1#2{\hbox{\ifnum\fam<0 \fam=0 \fi \the#1\fam #2}}
+
+\def\pozn#1{\leavevmode{\baselineskip=9pt\mnote{{\poznfont\Red #1}}}}
+\mnotesize=3cm
+
+%% ZKRATKY
+
+\def\gloslist{}
+% \def\glos #1#2{%
+%    \uppercase{\def\tmp{#1}}
+%    \expandafter\isinlist\expandafter\gloslist\csname;#1\endcsname
+%    \iftrue \opwarning{Duplicated glossary item `#1'}%
+%    \else 
+%       \global\sdef{;#1}{{#1}{#2}}%
+%       \global\expandafter\addto\expandafter\gloslist\csname;#1\endcsname
+%    \fi
+% }
+\def\glos #1#2{%
+	\uppercase{\glosA{#1}}{#1}{#2}}
+\def\glosA #1#2#3{%
+   \expandafter\isinlist\expandafter\gloslist\csname;#2\endcsname
+   \iftrue \opwarning{Duplicated glossary item `#2'}%
+   \else 
+      \label[glos:#2]\wlabel{#2}%
+      \sxdef{;#2}{{#1}{#2}{#3}}%
+      \global\expandafter\addto\expandafter\gloslist\csname;#2\endcsname
+   \fi
+}
+\def\makeglos{%
+   \ifx\gloslist\empty \opwarning{Gossary data unavailable}%
+   \else
+      \bgroup
+        \let\iilist=\gloslist
+%	\setprimarysorting
+        \dosorting
+        \def\act##1{\ifx##1\relax \else \expandafter\printglos##1\expandafter\act\fi}
+        \expandafter\act\iilist\relax
+      \egroup
+   \fi
+}
+\newdimen\glosindent  \glosindent=4\parindent
+\def\printglos #1#2#3{\noindent \hangindent=\glosindent \hbox to\glosindent{#2\dotfill}#3 {\male \pgref[glos:#2]}\par}
+
+%% CITACE
+\newif\ifcitaceAPA \citaceAPAfalse
+
+\def\citaceAPA{\citaceAPAtrue
+	\nonumcitations 
+	\def\cite[##1]{(\rcite[##1])}
+	\def\printcite##1{\citesep
+	   \prepcitelink{##1}\citelink{##1}{\the\bibmark}\def\citesep{,\hskip.2em\relax}%
+	}
+	\def\prepcitelink##1{%
+	   \isdefined{bim:##1}\iftrue
+	      \expandafter\expandafter\expandafter \ppclink \csname bim:##1\endcsname!\relax
+	   \else \opwarning{comprimed cites: empty bibmark}\bibmark={##1}%
+	   \fi
+	}
+	\def\ppclink ##1, ##2!\relax{\def\tmpa{##1}%
+	   \ifx \lastcitedname\tmpa \bibmark={##2}%
+	   \else \let\lastcitedname=\tmpa \if^##2^\bibmark={##1}\else\bibmark={##1, ##2}\fi
+	   \fi
+	}}
+
+\def\makebib{\ifcitaceAPA\usebibtex{diplomka}{apalike}\else\usebibtex{diplomka}{plain}\fi}
+
+\def\picplaceholder#1{\vrule\vbox{\hrule\kern5mm\hbox{\kern5mm (zde bude obrázek, #1)\kern5mm}\kern5mm\hrule}\vrule}
+
+%% ALGORITM
+\newcount\algoline
+\def\begalgo{\bgroup\interlinepenalty=100
+	\global\algoline=0
+	\expandafter\def\csname+\endcsname{\par\tabalign\kern\iindent\algolinenum}}
+\def\algolinenum{\global\advance\algoline by1
+\edef\thealgoline{\the\algoline}\wlabel\thealgoline\llap{\male\the\algoline.\kern1mm}}
+\def\endalgo{\par\egroup}
+
+% CAPTION
+\def\printcaption#1#2{\leftskip=\iindent \rightskip=\iindent
+   \setbox0=\hbox\bgroup \aftergroup\docaption{\bf#1 #2.}\enspace}
+\def\docaption{\tmpdim=\hsize \advance\tmpdim by-2\iindent
+   \ifdim\wd0>\tmpdim \unhbox0 \else \hfil\hfil\unhbox0 \fi \endgraf \egroup}
+\newcount\anum \anum=0
+\sdef{mt:a:cs}{Algoritmus} \sdef{mt:a:sk}{Algoritmus} \sdef{mt:a:en}{Algorithm}
+\def\theanum{\uppercase\expandafter{\athe\anum}}
+
+\long\def\parbox#1#2{{\emergencystretch=1em\hsize=#1\baselineskip=12pt\lineskip=1pt\lineskiplimit=0pt\vtop{#2\par}}}
+
+\def\argmin{\mathop{\rm arg\,min}}
+\def\algfill{\hbox to2em{\dotfill}}
+
+%%% Outlines
+
+\outlines3
+
+%%% Appendix
+
+\def\appendix#1\par{\ifnonum\else \global\advance\chapnum by1 \fi
+  \chaphook {\globaldefs=1 \secnum=0 \seccnum=0 \tnum=0 \fnum=0 \dnum=0}\relax
+  \edef\thechapnum{\uppercase\expandafter{\athe\chapnum}}\let\thetocnum=\thechapnum 
+  \def\dotocnumafter{\wcontents\Xchap{#1}}%
+  \printappendix{#1\unskip}\resetnonumnotoc
+}
+\def\printappendix#1{\vfil\break
+  {\chapfont \noindent \mtext{appendix} \dotocnum{\thetocnum}\par
+   \nobreak\smallskip\noindent #1\nbpar}\mark{}%
+  \nobreak \remskip\bigskipamount \firstnoindent
+}
+\sdef{mt:appendix:cs}{Dodatek} \sdef{mt:appendix:sk}{Dodatok} \sdef{mt:appendix:en}{Appendix}
+\def\asec#1\par{\ifnonum\else \global\advance\secnum by1 \fi
+  \sechook {\globaldefs=1 \seccnum=0 \tnum=0 \fnum=0 \dnum=0}\relax
+  \edef\thesecnum{\uppercase\expandafter{\athe\chapnum}.\the\secnum}\let\thetocnum=\thesecnum 
+  \printsec{#1\unskip}\resetnonumnotoc
+}
+\def\asecc#1\par{\ifnonum\else \global\advance\seccnum by1 \fi
+  \secchook {}\relax
+  \edef\theseccnum{\uppercase\expandafter{\athe\chapnum}.\the\secnum.\the\seccnum}\let\thetocnum=\theseccnum
+  \printsecc{#1\unskip}\resetnonumnotoc
+}
+
+%%% XML
+\def\xml{\catcode`\<=13 \adef<{\unskip$\char`\<$} \catcode`\>=13 \adef>{$\char`\>$}}
+
+%%% FIGURE
+
+\def\begfigure{\midinsert\bigskip\bgroup}
+\def\endfigure{\par\egroup\bigskip\endinsert}
+
+\def\index#1{\raise4pt\hbox{\sevenrm #1} }
+\def\st{\index{st}}
+\def\nd{\index{nd}}
+\def\rd{\index{rd}}
+\def\th{\index{th}}
+
+\def\dt#1 = #2\par{{\hangindent=1.5cm\noindent\kern1.5cm\llap{#1 = }#2\par}}
+
+% \def\pozn#1{}
+
+\mathchardef \sq   "3\amsafam 03
 

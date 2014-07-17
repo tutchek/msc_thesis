@@ -1,0 +1,121 @@
+\newpage
+
+\label[chap:model]
+\chap A model for automated logistics problem
+
+\pozn{Zkontrolováno 15.7.}In this chapter we will formulate a model for the problem described in chapter \ref[chap:analysis].
+
+In the problem described in chapter \ref[chap:analysis], there are not capacity constraints restraining capacities of transfer routes between stores, since a retail company 
+typically outsources the delivery services. However, there are capacity constraints limiting the maximum amount of goods which can be processed by a store. We must handle all priority 
+transfers but we can refuse to plan low-priority transfers which would overload some of the stores.
+
+\sec Model
+
+We propose a model based on the path-based model described in section \ref[sec:models:networks]. As we have mentioned, we are not limited by the capacity of edges and we plan to transfer lots of
+types of goods at once. However, we need to prevent overloading of stores. Therefore, we chose a path-based model described in section \ref[secc:models:path-based] and we propose a CSP model
+based on it.
+
+\begitems 
+* ${\bf S}$, a set of stores.
+* ${\bf G}$, a set of goods.
+* ${\bf D}$, a set of demands. When a demand $i$ has been placed before a demand $j$, it holds that $i < j$. 
+* ${\bf P}$, a set of all possible paths between stores.
+* ${\bf T}$, a set of time events.
+* ${\rm Orig} \colon {\bf P} \rightarrow {\bf S}$, a function returning an origin store of a given path.
+* ${\rm Dest} \colon {\bf P} \rightarrow {\bf S}$, a function returning a destination store of a given path.
+* ${\rm Amount} \colon {\bf D}\times{\bf G} \rightarrow {\bbchar N}_0$, a function returning an amount of goods demanded by a given demand.
+* ${\rm Availability} \colon {\bf G} \times {\bf S} \rightarrow {\bbchar Z}$, a function returning an amount of goods available in a given store. It is a difference between $OnStock$ and a sum of all demands on a given store for the goods.
+* ${\rm Capacity} \colon {\bf S} \rightarrow {\bbchar N}$, a function returning a daily capacity of a given store.
+* ${\rm Duration} \colon {\bf P} \rightarrow {\bf T}$, a function returning a time needed to transfer goods along the path, when send right after the execution of the algorithm.
+* ${\rm OnTheWay} \colon {\bf G} \times {\bf S} \rightarrow {\bbchar N}_0$, a function returning an amount of goods which is delivered to a given store.
+* ${\rm Pri} \colon {\bf D} \rightarrow \{{\rm high}, {\rm low}\}$, a function returning a priority for a given demand.
+* ${\rm Time} \colon {\bf P}\times{\bf S}\rightarrow{\cal P}({\bf T})$, a function returning for a given store and path days when the goods sent along the path will be in the store. 
+\enditems
+
+Next, we introduce constrained variables:
+
+\nobreak
+\begitems
+* $X^g_{dp}\in \{0,1\}$, a decision variable representing whether the demand $d$ for a goods $g$ is at least partially transferred along the path $p$.
+* $Y^g_{dp}\in {\bbchar N}_0$, a variable containing an amount of goods $g$ for a demand $d$ transferred along a path~$p$.
+* $Z_d^g \in {\bbchar N}_0$, a variable containing a total amount of goods transferred for a demand~$d$. 
+\enditems
+
+First, we add a constraint \ref[model:constraint:availability] restricting the amount of goods which can be transferred from a particular store. The sum of the transferred amounts cannot exceed 
+the available amount of the goods in the store.
+
+\label[model:constraint:availability]
+$$\forall g \in {\bf G},\forall s \in {\bf S} : \sum_{d \in {\bf D}}\sum_{\scriptstyle p \in {\bf P} \atop\scriptstyle s = {\rm Orig}(p)}{\hskip-1emY_{dp}^g} \leq {\rm Availability}(g,s)\eqmark$$
+
+Next, we will add a constraint \ref[model:constraint:destination] which allows to serve a demand only with paths which end in its destination node.
+
+\label[model:constraint:destination]
+$$\forall g\in{\bf G},\forall d \in {\bf D}, \forall p \in {\bf P}, {\rm Dest}(p) \neq {\rm Dest}(d): Y_{dp}^g = 0\eqmark$$
+
+For the demands itself, we define constraints \ref[model:constraint:demand-sum] and \ref[model:constraint:demand-limit] which limit the total flow of goods based on the value of the demand.
+
+\label[model:constraint:demand-sum]
+$$\forall g \in {\bf G}, \forall d \in {\bf D}: Z_{d}^g = \sum_{p \in P}{Y_{dp}^g}\eqmark$$
+
+\label[model:constraint:demand-limit]
+$$\forall g \in {\bf G}, \forall d \in {\bf D}: Z_{d}^g \leq {\rm Amount}(d, g)\eqmark$$
+
+For the objective function, as described below, it is useful to introduce a constraint \ref[model:constraint:decision], which allows us to detect used paths.
+
+\label[model:constraint:decision]
+$$\forall g \in {\bf G}, \forall d \in {\bf D}, \forall p \in {\bf P}: Y_{dp}^g > 0 \Leftrightarrow X^g_{dp} = 1 \eqmark$$
+
+To enforce an order of precedence we introduce a constraint \ref[model:constraint:order]. We can plan a transfer for a demand only if all previous demands were resolved, i.e. the sum of goods which is 
+currently on the way and of all already planned transfers for the goods covers at least the sum of demanded amount of goods on the demands.
+
+\penalty-500
+\label[model:constraint:order]
+% $$\forall g \in {\bf G},\forall s \in {\bf S},\forall d \in {\bf D}, d > 1: Z_{d}^g > 0 \Rightarrow \hskip\displaywidth minus 1fill$$
+% $$\hskip\displaywidth minus1fill\Rightarrow {\rm OnTheWay}(g,s) + \sum_{\scriptstyle i \in {\bf D}, i < d\atop\scriptstyle {\rm Pri}(i)={\rm high}}\sum_{\scriptstyle p \in {\bf P}\atop\scriptstyle 
+% s = Dest(p)}{\hskip-1emY_{ip}^g} \geq \sum_{\scriptstyle i \in {\bf D}, i < d \atop {\scriptstyle s=Dest(i)\atop\scriptstyle {\rm Pri}(i)={\rm high}}}{\hskip-1em{\rm Amount}(i, g)} \eqmark$$
+
+
+$$ \forall g \in {\bf G}, \forall s \in {\bf S}, \forall d \in {\bf D}, d > \min\bigl\{i | i\in {\bf D}, {\rm Amount}(i,g) > 0, s = {\rm dest}(i)\bigr\}: \hskip\displaywidth minus 1fill$$
+$$\hskip\displaywidth minus 1fill  Z_d^g > 0 \Rightarrow \hskip-1.5em\bigwedge_{\scriptstyle i \in {\bf D}, i < d \atop {\scriptstyle s={\rm Dest}(i)\atop{\scriptstyle {\rm Pri}(i)={\rm high}\atop
+\scriptstyle {\rm Amount}(i,g) > 0}}}{\hskip-1.5em\left(Z_i^g = {\rm Amount}(i,g)\right)} \eqmark $$
+
+
+Importantly, we must ensure that we will plan as many transfers as possible. Otherwise, the objective function \ref[model:constraint:of] would prefer the empty solution (which is the shortest possible).
+Therefore, we introduce a constraint \ref[model:constraint:all].
+
+\label[model:constraint:all]
+$$\forall g \in {\bf G}:\hskip-1em\sum_{\scriptstyle d \in {\bf D}\atop\scriptstyle {\rm Pri}(d) = {\rm high}}{\hskip-1em Z^g_d} = \min\left\{\sum_{\scriptstyle s \in {\bf S}\atop\scriptstyle
+{\rm Availability}(g,s) > 0}{\hskip-2em{\rm Availability}(g,s)},\hskip-1em\sum_{\scriptstyle d \in {\bf D}\atop\scriptstyle {\rm Pri}(d) = {\rm high}}{\hskip-1em{\rm Amount}(d,g)}\right\} 
+\eqmark$$
+
+Finally, we introduce a constraint \ref[model:constraint:overload] which prevents the overload of stores. Each store has a given daily capacity which should not be exceeded if possible. We can always plan a
+high-priority transfer but we cannot plan a low-priority transfer through a store, if it would cause its overload.
+
+\label[model:constraint:overload]
+$$\forall s \in {\bf S}, \forall t \in {\bf T}: \sum_{g \in {\bf G}}\sum_{d \in {\bf D}}\sum_{\scriptstyle p \in {\bf P}\atop\scriptstyle t \in {\rm Time}(p,s)}{\hskip-1emY^g_{dp} \geq {\rm Capacity}(s)} 
+\Rightarrow \sum_{g \in {\bf G}}\sum_{\scriptstyle p\in{\bf P}\atop\scriptstyle t \in {\rm Time}(p,s)}\sum_{\scriptstyle d \in {\bf D}\atop\scriptstyle{\rm Pri}(d) = {\rm low}}{\hskip-1emY^g_{dp}} = 0 \eqmark$$
+
+For this model we introduce an objective function \ref[model:constraint:of]. There are two requirements for the solution. First, the final plan should be as fast as possible. Secondly, as many demands
+as possible should be resolved. These two requirements are contradictory. If we decide to avoid all of the low-priority transfers, we will get faster plan than if we have resolved some of them.
+On the other hand, if we decide to resolve as many as possible low-priority transfers, the resulting plan does not have to be the fastest one. Therefore, we introduce the parameters $\alpha$ and $\beta$.
+We can use them to tune the model to our needs.
+
+\label[model:constraint:of]
+$$\min\left\{\alpha\sum_{g\in {\bf G}}\sum_{d \in {\bf D}}\sum_{p \in {\bf P}}{X^g_{dp}{\rm Duration}(p)} - \beta \sum_{g \in {\bf G}}\sum_{d \in {\bf D}}\sum_{p \in {\bf P}}{Y^g_{dp}}\right\}
+\eqmark$$
+
+The model as proposed has one disadvantage. The number of constrained variables is huge even for small problems. The number of constrained variables is $O(|{\bf G}|\cdot|{\bf S}|^2\cdot|{\bf D}|) \sim 
+O(n^4)$,  since there are $|{\bf G}|$ goods, $|{\bf S}|^2$ paths and $|{\bf D}|$ demands. However, we can radically decrease the number of constrained variables. We do not have to post variables 
+which would clearly not be
+satisfied. For example, the variable $Y_{dp}^g$ should be posted only if the demand $d$ demands a goods $g$ and if its store is the same as the destination store of $p$. Moreover, we should put into
+a set ${\bf D}$ only demands, which could be potentially resolved (i.e. there is at least one item of goods available in stores) and into a set ${\bf G}$ put only goods which is requested by some of 
+the demands already placed in ${\bf D}$.
+
+\sec CSP solver
+
+To implement the previously stated model, we use a state of the art CSP\glos{CSP}{Constraint satisfaction problem} solver. Nowadays, there are many solvers available but we sought for a cost optimal solution, which is preferably Java based, since it would easily merge with other Sunnysoft program environment. Therefore, based on the experiences in \cite[Tulacek2009] we used a Java based CSP solver 
+Choco \cite[choco].
+
+The proposed constraints can be directly rewritten in Choco. Thus, we did not need to reformulate the model to meet the available constraints. Still, there are some issues connected to the 
+implementation. Some of them are discussed in the Appendix \ref[ap:implementation].
+

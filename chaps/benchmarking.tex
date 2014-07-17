@@ -1,0 +1,90 @@
+\newpage
+
+\label[chap:benchmarking]
+\chap Benchmarking
+
+\pozn{Zkontrolovano 15.7.}To evaluate the model proposed in the previous chapter, we compare it with the algorithm described in chapter \ref[chap:analysis]. We perform tests on real data collected during fiscal year 07/2013---06/2014.
+
+\sec A simulator for automated logistics
+
+As we described in chapter \ref[chap:analysis], the whole process is controlled by documents. Therefore, based on the data in ERP, we are able to establish the $InStock$ values for each store in any
+given moment. Moreover, we have the demands represented by shipment orders and also warehouse receipts which indicate if and when there was an increase in the amount of goods in a given store.
+
+In order to test our algorithm, we created a simulator which generates demands for the planner and applies the generated plan.
+
+\begitems \style N
+* {\em Intialization}. For a given date $d$, the simulator sets $Availability_{g,s} = InStock_{g,s}$ based on the history of stock supplies. Then it prepares a sequence of demands ${\bf D}$ and 
+a sequence of store replenishments ${\bf R}$, both ordered by date, where the date of the first element of both sequences is after $d$. We introduce a sequence of shedules ${\bf Sch} = \emptyset$.
+* {\em Pre-planning phase}. In this phase, the simulator sets $d'=d$ and increases $d$ by a predefined step. Then it constructs a sequence ${\bf D'} \subset {\bf D}$ of demands, which occurred since $d'$.
+Next, it updates an $Availability_{g,s}$ with replenishments from ${\bf R}$ which occurred since $d'$ and removes them from ${\bf R}$. Similarly, it processes schedules in ${\bf Sch}$. For each schedule
+$sch \in {\bf Sch}$ which is planned between $d'$ and $d$, the simulator lowers the corresponding $OnTheWay_{g,s}$ and increases $Availability_{g,s}$. Then it computes a set of shortest paths ${\bf P}$ 
+between the stores, with shipment time $d$.
+* {\em Planning}. The simulator runs the selected planner algorithm with ${\bf D'}$ and ${\bf P}$ as an input, producing a set of plans ${\bf Pl}$.
+* {\em Update phase}. Each plan $pl \in {\bf Pl}$ contains an information about the origin store $s_o$, the destination store $s_d$, goods to be transferred $s_o$, its $amount$ and a reference to 
+a demand $d$, which is resolved by the plan. According to the plan, the simulator decreases the requested amount of goods $g$ in $d$. If the demand $d$ is completely resolved, i.e. it does not demand
+any goods, it is removed from ${\bf D}$. Then it decreases $Availability_{g,s_o}$ and increases $OnTheWay_{g,s_d}$ by $amount$. Finally, it adds a new schedule to ${\bf Sch}$ for transfer of $amount$ 
+goods $g$ to store $s_d$ with a scheduled time based on the shortest path in ${\bf T}$ between $s_o$ and $s_d$. Afterwards, it continues with phase 2).
+\enditems
+
+\sec Description of the benchmarks
+
+We test the model on data from 1\st November to 24\th December 2013. Due to the increased pre-Christmas demand rate, this period is the most challenging part of the year. We run the 
+simulations with the CSP model, described in Chapter \ref[chap:model], Na\"{\i}ve algorithm described in section \ref[secc:analysis:naive] and Ford-Fulkerson based algorithm in section
+\ref[secc:analysis:ford-fulkerson].
+
+For each planning algorithm, we run a simulation with a 1-minute, 5-minute and 30-minute-long time step. Each of the configurations is run either with or without the low-priority demands.
+
+Since the CSP model has two parameters, $\alpha$ and $\beta$, we will run simulations with low-priority demands with various values of the parameters.
+
+We measure the following quantities:
+
+\begitems
+* Number of resolved demands.
+* Total time needed to completely resolve the demands.
+* Number of unresolved demands.
+* For each store a number of days when the store was overloaded due to exceeding the capacity.
+\enditems
+
+We do not compare the algorithms according to the running time, since it is not a critical issue for the problem. However, the CSP solver has a limit in finding the optimal solution. If it does not
+find a solution within one minute of the running time, the problem is considered as not being feasible.
+
+\secc Configuration of stores and deliveries
+
+The configuration of stores and delivery routes used in the benchmarks is presented on Figure \ref[fig:benchmarking:deliveries]. There are six stores -- central store (C), e-shop (E), Kovanecká 
+street (K), passage Grossmann (G), Brno (B) and 
+Plzeň (P). Three of them (central store, e-shop and Kovanecká street) are in one building. Therefore, the delivery is instant and can occur during the whole business day. The Grossmann store is 
+located in Prague and its delivery is maintained by a courier company. Therefore, it is not instant but the goods is still delivered in the same day as it is shipped. It is shipped and delivered at a regular
+fixed time. Finally, other routes are inter-city routes which occur only once a day at a fixed time. The shipment and delivery times are specific for a particular store.
+
+\begfigure
+\centerline{\inspic figs/benchmarking-deliveries-1.pdf }\nobreak\medskip
+\label[fig:benchmarking:deliveries]\caption/f The stores and delivery routes used in benchmarking. The row {\em s} represents the conditions for a shipment and the row {\em d} contains the duration
+of a transfer along the path and a corresponding delivery time.
+\endfigure
+
+\secc Low-priority demands
+
+The low priority demands are generated once a day between 6:00 and 6:59. For each goods $g$ the simulator computes the expected available amount of goods after resolving all of the demands. It uses
+the following formula:
+
+$$ExpectedTotalAvailability_g = \sum_{s \in {\bf S}}{InStock_{g,s}} - \sum_{d \in {\bf D}}{Demanded_{g,d}}, \eqmark$$
+
+\noindent where $Demanded_{g,s}$ means the amount of goods $g$ demanded by the demand~$d$. Afterwards, we compute desired amount on the stores. Since we want to balance amounts of goods equally, we use the 
+following formula
+
+$$DesiredAmount_g = \left\lceil ExpectedTotalAvailability_g \over |{\bf S}| \right\rceil, \eqmark$$
+
+\noindent and generate the low-priority demand $d$ for each store with 
+
+$$Demanded_{g,d} = DesiredAmount_g.$$
+
+\secc Shortest paths
+
+To compute a set of paths ${\bf P}$ between the stores, we use a Dijkstra's algorithm \cite[Dijkstra1959] on a directed graph displayed on Figure \ref[fig:benchmarking:deliveries]. The paths
+are computed for each run once again, since the shortest path depends on a current simulation's date and time. The lengths of paths are computed using the Algorithm \ref[alg:algorithm:delivery-time].
+
+\sec Experimental results
+
+
+\sec Discussion
+

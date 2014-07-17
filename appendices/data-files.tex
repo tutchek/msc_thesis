@@ -1,0 +1,132 @@
+
+\newpage
+\appendix Description of data files
+
+We used real data for the benchmarking. The data are generously provided by the company Sunnysoft and contain information about supplies and demands in the fiscal year 2013/14. The data files are located
+on the CD provided with this thesis. All files are in the XML format whose format is described bellow. We use a {\tt teletype} script to denote {\tt <tags>} and their {\tt parameters}.
+
+\asec Demands
+
+\begitems
+* File name: {\em demands.xml}
+* Root element: {\tt <demands>}
+* For each demand there is an element {\tt <demand>} with a parameter {\tt date} with a date of placing the demand in the ISO 8601 format \cite[iso8601] and a parameter {\tt store} with the id of a store, 
+where the demand is placed.
+* For each item of the demand there is an element {\tt <item>} with a parameter {\tt goods} which contains an id of requested goods and a parameter {\tt amount} containing the demanded amount of 
+goods.
+\enditems
+
+An example of {\em demands.xml}:
+
+\begalgo \tt
+\+ <?xml version="1.0"?>\cr
+\+ <demands>\cr
+\+ \quad&<demand date="2013-07-01T00:02:15+02:00" store="e">\cr
+\+ 	&\quad&<item goods="541741" amount="1" />\cr
+\+ 		&&<item goods="524796" amount="1" />\cr
+\+ 		&&<item goods="527972" amount="1" />\cr
+\+ 	&</demand>\cr
+\+ 	&<demand date="2013-07-01T00:27:48+02:00" store="e">\cr
+\+ 		&&<item goods="538318" amount="1" />\cr
+\+ 		&&<item goods="537576" amount="1" />\cr
+\+ 	&</demand>\cr
+\+&&$\dots$\cr
+\+ </demands>\cr
+\endalgo
+
+
+\asec Goods and history of stock availability
+
+\begitems
+* File name: {\em goods.xml}
+* Root element: {\tt <goods>}
+* For each article there is an element {\tt <article>} with a parameter {\tt id}  containing the id of the article.
+* For each event in the stock availability history there is an element\break {\tt <history>} with a parameter {\tt date} containing the date of the event in  the ISO 8601 format \cite[iso8601].
+* For each store there is an element {\tt <store>} with a parameter {\tt store} containing the id of a store, a parameter {\tt onStock} containing the amount of the article in the store and a 
+parameter {\tt onTheWay} containing an amount of the article which is currently transferred from other stores.
+\enditems
+
+An example of {\em goods.xml}:
+
+\begalgo  \tt
+\+ <?xml version="1.0"?>\cr
+\+ <goods>\cr
+\+ \quad&<article id="520003">\cr
+\+ 		&\quad&<history date="2014-07-01T00:00:00+02:00">\cr
+\+ 			&&\quad&<store store="c" onStock="0" onTheWay="0" />\cr
+\+ 			&&&<store store="k" onStock="0" onTheWay="0" />\cr
+\+ 			&&&<store store="b" onStock="0" onTheWay="0" />\cr
+\+ 			&&&<store store="g" onStock="0" onTheWay="0" />\cr
+\+ 			&&&<store store="e" onStock="0" onTheWay="0" />\cr
+\+ 			&&&<store store="p" onStock="0" onTheWay="0" />\cr
+\+ 		&&</history>\cr
+\+ 	&</article>\cr
+\+ 	&<article id="520848">\cr
+\+ 	&&	<history date="2013-07-04T11:48:37+02:00">\cr
+\+ 	&&		&<store store="c" onStock="0" onTheWay="0" />\cr
+\+ 	&&		&<store store="k" onStock="1" onTheWay="0" />\cr
+\+ 	&&		&<store store="b" onStock="3" onTheWay="0" />\cr
+\+ 	&&		&<store store="g" onStock="3" onTheWay="0" />\cr
+\+ 	&&		&<store store="e" onStock="2" onTheWay="0" />\cr
+\+ 	&&		&<store store="p" onStock="2" onTheWay="0" />\cr
+\+ 	&&	</history>\cr
+\+ 	&&	<history date="2013-07-09T11:51:12+02:00">\cr
+\+ 	&&		&<store store="c" onStock="0" onTheWay="0" />\cr
+\+ 	&&		&<store store="k" onStock="1" onTheWay="0" />\cr
+\+ 	&&		&<store store="b" onStock="3" onTheWay="0" />\cr
+\+ 	&&		&<store store="g" onStock="3" onTheWay="0" />\cr
+\+ 	&&		&<store store="e" onStock="1" onTheWay="0" />\cr
+\+ 	&&		&<store store="p" onStock="2" onTheWay="0" />\cr
+\+ 	&&	</history>\cr
+\+ 	&&	$\dots$\cr
+\+ &</article>\cr
+\+ &$\dots$\cr
+\+ </goods>\cr
+\endalgo
+
+\asec Stores
+
+\begitems
+* File name: {\em stores.xml}
+* Root element: {\tt <stores>}
+* For each store there us an element {\tt <store>} with a parameter {\tt id} containing the identifier of the store used in other files and a parameter {\tt capacity} denoting a maximal daily amount
+of goods processed in the store.
+\enditems
+
+An example of {\em stores.xml}:
+
+\begalgo\tt
+\+ <?xml version="1.0"?>\cr
+\+ <stores>\cr
+\+ \quad&<store id="c" capacity="50" />\cr
+\+      &<store id="k" capacity="50" />\cr
+\+      &<store id="b" capacity="50" />\cr
+\+	&$\dots$\cr
+\+ </stores>\cr
+\endalgo
+
+\asec Deliveries
+
+\begitems
+* File name: {\em deliveries.xml}
+* Root element: {\tt <deliveries>}
+* For each delivery there is an element {\tt <delivery>} with mandatory parameters {\tt from} denoting the origin store, {\tt to} denoting the destination store, {\tt time} denoting a time or a time
+range of possible shipment, {\tt day} denoting a day of week or a range of days of week of possible shipment (0~=~Sunday, 1~=~Monday and so on), and a {\tt type} which can be {\em instant} if the delivery
+does not last any notable time (for example if it is only an accountancy operation\fnote{The stores can be either some physical entity like dedicated room, or it can be only a virtual entity in the
+ERP system. In such case, we can move goods from store to store just with generating of respective documents without physical contact with the goods.} or from one room to another) or {\em carrier}, if 
+the goods is shipped by an external delivery company. In such case, there are two other parameters. The first is a parameter {\tt duration} with the estimated duration of transfer in days and the 
+second is {\tt delivery\_time} with the time of expected delivery to the store.
+\enditems
+
+An example of {\em deliveries.xml}:
+
+\begalgo\tt
+\+ <?xml version="1.0"?>\cr
+\+ <deliveries>\cr
+\+ \quad	&<delivery from="c" to="k" time="9:00-17:00" day="1-5"\cr
+\+		&\quad&type="instant" />\cr
+\+ 	&<delivery from="b" to="e" time="12:00" day="1-5"\cr
+\+ 	&&type="carrier" duration="1" delivery\_time="11:00" />\cr
+\+ 	&$\dots$\cr
+\+ </deliveries>\cr
+\endalgo

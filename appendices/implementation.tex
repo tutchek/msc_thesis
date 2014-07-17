@@ -1,0 +1,113 @@
+\newpage
+\label[ap:implementation]
+\appendix Implementation notes
+
+The simulator and model implementations are programmed in the Java programming language. We used a CSP solver Choco in version 3.2.0 available at {\tt http://www.emn.fr/z-info/choco-solver/index.php?page=choco-3}
+
+\asec Constraint solver
+
+The constraint solver is a Java object of type {\tt Solver}. The model is formulated with constrained variables and constraints of various types, posted to the solver. The Choco system does not 
+distinguish between the model variables and solution variables. The problem solving consists of the following steps.
+
+\begitems \style N
+* Creation of a {\tt Solver} class instance.
+* Definition of constrained variables. The variables are created with a reference to the solver object.
+* Creation of constrains and posting of them to the solver.
+* Solution search performed by the model. It can either search for any solution or it can search for the optimal solution with respect to the given objective function.
+* Reading of the values of constrained variables, defined in Step 2.
+\enditems
+
+\asec Variables and views
+
+In our model have the variables the following domains: ${\bbchar N}_0$, ${\bbchar Z}$, $\{0,1\}$ and $\{y\}$. For the first two domains we use a bounded {\tt IntVar} variables. These are integer variables whose 
+domain is an interval $[min,max]$. However, we cannot use an infinite bound. Instead, we bound the variable with the maximal possible value. However, we cannot use a Java constant $Integer.MAX\_VALUE$ 
+(whose value is $2,147,483,647$) but we must use a Choco specific constant {\tt VariableFactory.MAX\_INT\_BOUND} with a value $21,474,836$. This value is high enough for our purposes. The variables with
+domain $\{0,1\}$ are represented with objects of class {\tt BoolVar}. Finally, the variables with single value domain, also called ``fixed" variables, are construed as {\tt IntVar}. The variables are 
+construed with the following methods of a {\tt VariableFactory} class:
+
+\begitems
+* {\tt BoolVar bool(String name, Solver s)}
+* {\tt IntVar bounded(String name, int min, int max, Solver s)}
+* {\tt IntVar fixed(int value, Solver s)}
+\enditems
+
+The solver offers simplified form for declaring variables, which are in the form $yX$ or $(X + y)$, i.e. they are derived from an existing constrained variable and are multiplied or shifted with
+a constant. Indeed, we could write these variables as a combination of a new constrained variable and a constraint, for example declare a variable $Y$ and post a constraint $Y = yX$. However,
+the Choco system offers an easier way. We can define a special variable type {\em view}, which is connected to a previously defined constrained variable or to another view. We use three types of
+view, an {\em offset} ($X = Y + z$), a {\em scale} ($X = zY$) and a {\em minus} ($X = -Y$). The views can be used whenever we can used a normal constrained variable.
+
+\asec Constraints
+
+To describe constraints, we use the following notation: 
+
+\begitems
+* $X, Y, \dots$ for constrained variables
+* $x,y,\dots$ for constants.
+* $\varphi, \psi, \dots$ for constraints.
+* $\cdot \sq \cdot$ for a binary relation (i.e. $<, \leq, =, \geq, >, \neq$)
+\enditems
+
+For all of the following constraints it holds, that relation variable {\tt op} has one of the following values: {\tt <}~for~$<$, {\tt <=}~for~$\leq$, {\tt =}~for~$=$, {\tt >=}~for~$\geq$, {\tt >}~for~$>$
+and finally {\tt !=}~for~$\neq$.
+
+The constraints are represented by Java objects of generic type {\bf Constraint}. Therefore, we can combine them as we did for example in case of the constraint~\ref[ap:impl:impl].
+
+In the model, there are following types of constraints:
+
+$$X \sq y \eqmark$$
+$$X \sq Y \eqmark$$
+
+Both constraints can be formulated using the {\tt IntConstraintFactory} as follows:
+\begitems
+* {\tt Constraint arithm(IntVar var1, String op, IntVar var2)}
+* {\tt Constraint arithm(IntVar var1, String op, int constant)}.
+\enditems
+
+\label[ap:impl:sum:var]
+$$\sum X \sq Y \eqmark$$
+
+There are two constraints for the constraint \ref[ap:impl:sum:var]. The first is a simplified form for the case $\sq\, \sim\, =$ and the second one is for general relation operator $\sq$. The constraints
+are provided by {\tt IntConstraintFactory}:
+
+\begitems
+* {\tt Constraint sum(IntVar[] vars, IntVar sum)}
+* {\tt Constraint sum(IntVar[] vars, String op, IntVar sum)}
+\enditems
+
+\label[ap:impl:sum:const]
+$$\sum X \sq y \eqmark$$
+
+The Choco system does not contain a constraint which allows us directly formulate the constraint \ref[ap:impl:sum:const]. Instead, we can define a dummy constrained variable $D$ and post two constraints
+$\sum X \sq D, D = y$. The second way, which is used in our implementation, is to introduce a dummy fixed constrained variable $D$ with a domain $\{y\}$ and then post a constraint $\sum X \sq D$.
+
+\label[ap:impl:and]
+$$\bigwedge \varphi \eqmark$$
+
+The constraint \ref[ap:impl:and] is written using the {\tt LogicalConstraintFactory} constraint {\tt and} as follows:
+\nobreak
+\begitems
+* {\tt Constraint and(Constraint... constraints)}
+\enditems
+
+\label[ap:impl:impl]
+$$\varphi \Rightarrow \psi \eqmark$$
+
+The implication constraint \ref[ap:impl:impl] is based on the {\tt LogicalConstraintFactory} constraint {\tt ifThen} with following signature:
+
+\begitems
+* {\tt Constraint ifThen(Constraint ifCon, Constraint thenCon)}
+\enditems
+
+$$\varphi \Leftrightarrow \psi \eqmark$$
+
+In Choco there is no special constraint for the equivalence relation. However, we can simply rewrite it as two implications: $\left(\varphi \Rightarrow \psi\right) \wedge \left(\varphi \Leftarrow \psi\right)$.
+
+\asec Solutions
+
+The solver is able to run in two modes. In the first one, it searches for any solution, which is feasible for given sets of variables and constraints. The application can request the solutions 
+iteratively one after another, or all together. In the second case, the solver can find an optimal solution with respect to a given objective function. The objective function value is represented
+by a constrained variable. The solver receives the constrained variable and a direction of optimization, i.e. whether the final value of the variable should be the minimal or the maximal.
+
+However, there is one problem with the optimal solution finder. Compared to ``find any solution" strategy, which clearly indicated, that there is at least one feasible solution (otherwise it returns
+{\tt false}), the optimal solution by itself does not indicate, that it did not find anything. We have to specially ask the solver, whether the problem is feasible or not.
+

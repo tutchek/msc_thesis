@@ -2,31 +2,30 @@
 
 \label[chap:models]
 
-\chap Models
+\chap Existing models
 
-In this chapter, we review useful models and techniques which shall help us formulate a model for the problem described in the chapter \ref[chap:] and approaches commonly used to solve
-such models.
+\pozn{zkontrolováno 15.7.}In this chapter, we will review useful models and techniques which will help us formulate a model for the problem described in chapter \ref[chap:analysis].
 
 \sec Transportation problems
 
-The problem as described in the chapter \ref[chap:motivation] is an instance of transportation problem, as described in \cite[Helmert2003]. This paper describes a Transport task as a 9-tuple
-$(V, M, P, l_0, P_G, l_G, fuel_0, cap, road)$, where
+In \cite[Helmert2003], there is described a Transport task as a 9-tuple
+$({\bf V},\penalty0 {\bf M},\penalty0 {\bf P},\penalty0 l_0,\penalty0$ ${\bf P}_G,\penalty0 l_G,\penalty0 fuel_0,\penalty0 cap,\penalty0 road)$, where
 
-\begitems \style N
-* $V$ is a finite set of {\em locations},
-* $M$ is a finite set of {\em mobiles},
-* $P$ is a finite set of {\em portables},
-* $l_0:(M \cup P) \to V$ is the {\em initial location} function,
-* $P_G \subseteq P$ is the set of {\em goal portables},
-* $l_G: P_G \to V$ is the {\em goal location} function,
-* $fuel_0:V \to {\bbchar N} \cup \{\infty \}$ is the {\em initial fuel} function,
-* $cap: M\to {\bbchar N}$ is the {\em capacity} function, and finally
-* $road: M\to {\script P}(V \times V)$ is the {\em roadmap} function.
+\begitems
+* ${\bf V}$ is a finite set of {\em locations},
+* ${\bf M}$ is a finite set of {\em mobiles},
+* ${\bf P}$ is a finite set of {\em portables},
+* $l_0:({\bf M} \cup {\bf P}) \to {\bf V}$ is the {\em initial location} function,
+* ${\bf P}_G \subseteq {\bf P}$ is the set of {\em goal portables},
+* $l_G: {\bf P}_G \to {\bf V}$ is the {\em goal location} function,
+* $fuel_0:{\bf V} \to {\bbchar N} \cup \{\infty \}$ is the {\em initial fuel} function,
+* $cap: {\bf M}\to {\bbchar N}$ is the {\em capacity} function, and finally
+* $road: {\bf M}\to {\cal P}(V \times V)$ is the {\em roadmap} function.
 \enditems
 
 We require that $V, M, {\fam 0 and\ } P$ are disjoint, and that $(V, road(m))$ is an undirected graph for all $m \in M$ (i.e., for all $m \in M$, the relation $road(m)$ is symmetric and irreflexive).
 
-The paper classifies the transportation problems into groups by the value of {\em capacity}, {\em fuel units} and {\em mobiles} parameters as follows:
+The paper classifies the transportation problems into groups by {\em capacity} value, {\em fuel units} and {\em mobiles} parameters as follows:
 
 \bigskip
 
@@ -35,84 +34,214 @@ The paper classifies the transportation problems into groups by the value of {\e
 \bf fuel units & one per location & unbounded & varies \crli
 \bf mobiles & one mobile & one roadmap & many roadmaps \crl}
 \par\nobreak\medskip
-\caption/t Values of the parameters of the transportation problems according to which the problems are classified.
+\caption/t Parameter values of the transportation problems according to classification of the problems.\par\bigskip
 
-\bigskip
+\secc Vehicle routing problems (VRP)
 
-we can expect that this problem is NP-complete.
-
-\sec Vehicle routing problems (VRP)
-
-Vehicle routing problem is a transportation problem solving the need to visit a certain amount of destinations with a fleet of trucks. The vehicle routing problem 
+\glos{VRP}{Vehicle routing problem}Vehicle routing problem is a transportation problem solving the need to visit a certain amount of destinations with a fleet of trucks. The vehicle routing problem 
 is {\it NP-hard} \cite[Lenstra1981]. Still, the vehicle routing problem is widely used in real applications and thus is well researched. Lots of usage examples are 
 discussed in \cite[Golden2001].
 
-\sec Capacitated vehicle routing problem (cVRP)
+\secc Capacitated vehicle routing problem (cVRP)
 
-As described in \cite[Dantzig1959], the capacitated vehicle routing problem (originally The Truck Dispatching Problem) may be defined as follows:
+\glos{cVRP}{Capacitated vehicle routing problem}As described in \cite[Dantzig1959], the capacitated vehicle routing problem (originally The Truck Dispatching Problem) may be defined as follows:
 
 \begitems \style N
-* Given a set of $n$ ``station points'' $P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
-* A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between every pair of points $(i,j = 0, 1, \dots, n)$.
-* A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to every point $P_i\, (i=1,2,\dots,n)$.
+* Given a set of $n$ ``station points'' ${\bf P} = P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
+* A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between each pair of points $(i,j = 0, 1, \dots, n)$.
+* A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to each point $P_i\, (i=1,2,\dots,n)$.
 * The truck capacity is $C$, where $C > \max{q_i}$.
 * If $x_{ij} = x_{ji} = 1$ is interpreted to mean that points $P_i$ and $P_j$ are paired $(i,j = 0,1,\dots,n)$ and if $x_{ij} = x_{ji} = 0$ means that the points are not paired, one
 obtains the condition
 $$\sum_{j=0}^n{x_{ij}} = 1\quad (i=1,2,\dots,n)$$
-since every point $P_i$ is either connected with $P_0$ or at most one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
+since every point $P_i$ is either connected with $P_0$ or at most with one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
 * The problem is to find those values of $x_{ij}$  which make the total distance
 $$D = \sum_{i,j=0}^{n}{d_{ij}x_{ij}}$$
-a miniumum under the conditions specified in 2) to 5).
+a minimum under the conditions specified in 2) to 5).
 \enditems
 
-\sec Vehicle routing problem with time windows (VRPTW)
+\secc Vehicle routing problem with time windows (VRPTW)
 
-The VRPTW can be according to \cite[Braysy2005] described as follows:
+\glos{VRPTW}{Vehicle routing problem with time windows}The VRPTW can be according to \cite[Braysy2005] described as follows:
 
 \begitems \style N
-* Let $G=(V,E)$ be a connected digraph consisting of a set of $n+1$ nodes, each of which can be serviced only within a specified time interval or time window and a set of non-negative weights,
+* Let $G=(V,E)$ be a connected directed graph consisting of a set of $n+1$ nodes, each of which can be serviced only within a specified time interval or time window and a set of non-negative weights,
 $d_{ij}$, and with associated travel times, $t_{ij}$.
 * The travel time, $t_{ij}$, includes a service time at node $i$, and a vehicle is permitted to arrive before the opening of the time window.
 * Node 0 represents the depot.
 * Each node $i$, apart from the depot, imposes a service requirement, $q_i$, that can be a delivery from or a pick-up for the depot.
-* The objective is to find the minimum number of tours, $K^\hv$, for a set of identical vehicles such that each node is reached within time window and the accumulated service up to any node
+* The objective is to find the minimum number of tours, ${\bf K}^\hv$, for a set of identical vehicles such that each node is reached within the time window and the accumulated service up to any node
 does not exceed a positive number $Q$ (vehicle capacity).
 * A secondary objective can be imposed. It is either to minimize the total distance travelled or the duration of the routes.
 \enditems
 
 As the cited article states, the VRPTW is widely used and thus well researched problem. Moreover, there exists many heuristics to solve it.
 
-\sec Vehicle routing problem as a job scheduling problem
 
-In \cite[Beck2002] the VRP is reformulated as an scheduling problem. However, these reformulations have not a same performance. As described in \cite[Beck2003], in an optimisation task
-the VRP is better in minimising of the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
-significantly worse than scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
+\secc Stochastic vehicle routing (SVRP)
 
+\glos{SVRP}{Stochastic vehicle routing problem}As presented in \cite[Gendreau1996], stochastic vehicle routing problems arise whenever some elements of the problem are random, for example stochastic demands or stochastic travel times.
+The paper describes an approach using stochastic programming. Such a stochastic program is modelled in two stages -- the first is ``a priori'' solution and the second is a ``corrective action''.
+A stochastic program is usually modelled either as a {\em chance constrained program} (CCP\glos{CCP}{Chance constrained program}), where the solution is searched with respect to a particular threshold for a probability of a failure, or
+as a {\em stochastic program with recourse} (SPR\glos{SPR}{Stochastic program with recourse}) minimising the expected cost of the second stage solution plus the expected net cost of recourse.
+The SVRPs are usually modelled as mixed or pure integer stochastic programs or as Markov decision processes.
 
-\sec A classification scheme for vehicle routing ans scheduling problems
+The most studied problem in this class is the {\em Vehicle Routing Problem with Stochastic Demands} (VRPSD\glos{VRPSD}{Vehicle Routing Problem with Stochastic Demands}). In this problem, customer demands are independent random variables.
+The next is the {\em Vehicle Routing Problem with Stochastic Customers} (VRPSC\glos{VRPSC}{Vehicle Routing Problem with Stochastic Customers}) with customers which are present with some probability but have deterministic demands. A combination of both
+previously mentioned problems is the Vehicle Routing Problem with Stochastic Customers and Demands (VRPSCD\glos{VRPSCD}{Vehicle Routing Problem with Stochastic Customers and Demands}). This problem is extremely hard to solve.
 
-As proposed in \cite[Desrochers1990], one can construct a classification scheme which can be used to select a appropriate model to solve a real-life problem. The scheme can be used only
-to handle static problems, where the data do not change. The scheme used a formalised language using four or five fields:
+% \secc A classification scheme for vehicle routing and scheduling problems
+% 
+% As proposed in \cite[Desrochers1990], one can construct a classification scheme which can be used to select an appropriate model to solve a real-life problem. The scheme can be used only
+% to handle static problems, where the data do not change. The scheme used a formalised language using four or five fields:
+% 
+% \begitems \style N 
+% * characteristics and constraints relevant only to a single address (the scheme uses the term address rather than customer),
+% * characteristics relevant to a single vehicle, 
+% * all program characteristics that cannot be identified with single address or vehicle, 
+% * one or more objective functions
+% * description of additional information about specific class of problem instances (this field is optional).
+% \enditems
+% 
+% For example the above mentioned cVRP expressed in this notation has the following form 
+% 
+% $$1\,|\,m,cap\,|\,|\,\Sigma\, T_i$$
+% 
+% which means that there is one depot, $m$ vehicles each with the capacity $cap$ and the objective function is a sum of route durations.
 
-\begitems \style N 
-* characteristics and constraints relevant only to a single address (the scheme uses the term address rather than customer),
-* characteristics relevant to a single vehicle, 
-* all program characteristics that cannot be identified with single address or vehicle, 
-* one or more objective functions
-* description of additional information about specific class of problem instances (this field is optional).
-\enditems
+\sec Scheduling
 
-For example the above mentioned cVRP expressed in this notation has the following form -- ``$1|m,cap|\,|{\fam0 sum}\,T_i$'' -- which means that there is one depot, $m$ vehicles each with the 
-capacity $cap$ and the objective function is sum of route durations.
+\secc Vehicle routing problem as a job scheduling problem
 
-\sec Daily aircraft routing and scheduling problem (DA\-RSP)
+In \cite[Beck2002] the VRP is reformulated as a scheduling problem. However, these reformulations do not have the same performance. As described in \cite[Beck2003], in an optimisation task,
+the VRP is better in minimising the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
+significantly worse than the scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
 
-Different approach represents the DARSP described in \cite[Desaulniers1997]. The problem is to generate a schedule for a heterogeneous aircraft fleet covering a set of operational flight legs 
-with known departure time windows, durations and profits according to the aircraft type. In the cited paper the problem is defines as follows: {\it ``Given a heterogeneous aircraft fleet, a set
+\secc Daily aircraft routing and scheduling problem (DA\-RSP)
+
+Different approach represents the DARSP\glos{DARSP}{Daily aircraft routing and scheduling problem} described in \cite[Desaulniers1997]. The problem is to generate a schedule for a heterogeneous aircraft fleet covering a set of operational flight legs 
+with known departure time windows, durations and profits according to the aircraft type. In the cited paper the problem is defined as follows: {\it ``Given a heterogeneous aircraft fleet, a set
 of operational flight legs over a one-day horizon, departure time windows, durations and costs / revenues according to the aircraft type for each flight leg, find a fleet schedule that maximises 
 profits and satisfies certain additional constraints.''}
 
 In the paper there are two formulations of the DARSP. The first is based as a Set Partitioning with additional constraints and the second as the time constrained multi-commodity network flow
-formulation. For each of the formulations the paper propose a solution strategy. For the Set Partitioning approach the branch-and-bound strategy is feasible and for the multi-commodity network flow
+formulation. For each of the formulations, the paper propose a solution strategy. For the Set Partitioning approach the branch-and-bound strategy is feasible and for the multi-commodity network flow
 the Dantzing-Wolfe or Lagrangean relaxation embedded in a branch-and-bound search tree.
+
+% \sec Commodity flow problems
+% 
+% In this section we will discuss problems which are based on network flows in a graph. First, we will focus on the constraint programming formulations of such problems. Afterwards, we will present
+% a generalisation of network flows -- multi-commodity flows.
+
+\label[sec:models:networks]
+\sec Constraint programming problems in networks
+
+As described in \cite[Simonis2006], the problems in networks can be easily modelled using a constraint programming. There are three usual types of the model -- a link-based model, a path-based model
+and a node-based model. 
+
+\secc Link-based model
+
+In the {\em link-based model}, for each demand we have one decision variable per link, which states if the link is used for this demand or not.
+
+\begitems \style N
+* For each demand $d$ and edge $e$ a variable $X_{de}$ with domain $\{0,1\}$ denotes whether the demand is routed over the edge.
+* For every demand $d$, we also have one $\{0,1\}$ decision variable $Z_d$ which indicates if the demand is accepted or not.
+\enditems
+
+With the objective function 
+
+$$\max\limits_{\{Z_d,X_{de}\}} \sum_{d\in D}{\rm val}(d)Z_d \eqmark$$
+
+and constraints:
+
+\label[models:eq:link]
+$$ \forall d \in {\bf D}, \forall n \in {\bf N}: \sum_{e \in {\bf OUT}(n)}{X_{de}} - \sum_{e \in {\bf IN}(n)}{X_{de}} = \cases{\hfill -Z_d & $n = dest(d)$\cr\hfill Z_d & $n=orig(d)$ \cr\hfill 0 & otherwise} \eqmark$$
+
+$$\forall e \in {\bf E}: \sum_{d \in {\bf D}}{{\rm bw}(d)X_{de} \leq {\rm cap}(e)} \eqmark $$
+
+$$Z_d \in \{0,1\}\quad X_{de} \in \{0,1\}$$
+
+\begfigure
+\centerline{\inspic figs/model-constraint-link-1.pdf \kern2cm \inspic figs/model-constraint-link-2.pdf \kern2cm \inspic figs/model-constraint-link-3.pdf }\nobreak\medskip
+\label[fig:models:constraint-link]\caption/f Effects enforced by the constraint imposed by the equation~\ref[models:eq:link].
+\endfigure
+
+As we can see on the figure \ref[fig:models:constraint-link], the constraint imposed by the equation \ref[models:eq:link] is equivalent to the first Kirchhoff`s law known from electrical engineering.
+There must be either no links from and to the node or there must be just one link ending in the node and just one link beginning in the node. There are two exceptions -- the origin node which is a
+beginning of exactly one link and the destination node which is an end of exactly one node.
+
+\label[secc:models:path-based]
+\secc Path-based model
+
+\pozn{Obrázek zde asi není nutný, protože path-based model je jasný...}In the {\em path-based model}, the decision variables represent paths used to route demands. 
+
+\begitems \style N
+* For each demand $d$ we assume there are $path(d)$ possible paths for the demand.
+* For each demand $d$ and possible path $i$ we introduce a $\{0,1\}$ variable $Y_{id}$ which denotes whether the demand is routed over the path.
+* For each edge $e$ and path $i$ for demand $d$ a constant $h_{id}^{e}$ indicate whether the path is routed over the edge.
+* For every demand $d$ we also have one $\{0,1\}$ decision variable $Z_d$ which indicates if the demand is accepted or not.
+\enditems
+
+\noindent With the objective function
+
+$$\max\limits_{\{Z_d,T_{id}\}} \sum_{d\in {\bf D}}{\rm val}(d)Z_d \eqmark$$
+
+\noindent and constraints:
+
+$$\forall d \in {\bf D}: \sum_{1 \leq i \leq path(d)}{Y_id = Z_d} \eqmark$$
+
+$$\forall e \in {\bf E}: \sum_{d \in {\bf D}}{{\rm bw}(d) \sum_{1 \leq i \leq path(d)}{h_{id}^e Y_{id} \leq {\rm cap}(e)}} \eqmark$$
+
+$$Z_d \in \{0,1\}\quad Y_{id} \in \{0,1\}$$
+
+\secc Node-based model
+
+In the {\em node-based model}, the decision variables represent successor relations between network nodes.
+
+For each demand $d$ and each node $k$ in the network, we introduce an integer decision variable $S_{kd}$ with the following domain:
+
+\label[models:eq:node]
+$$S_{kd} :: \cases{\bigl\{sink(e) | e \in {\bf OUT}(k)\bigr\} & $k=orig(d)$ \cr orig(d) & $k=dest(d)$ \cr \{0\} \cup \bigl\{sink(e) | e \in {\bf OUT}(k)\bigr\} & otherwise} \eqmark$$
+
+For each demand the domain for a node contains all possible successors and the value 0, which indicates that the node is not used to route the demand. The destination node contains a back-link to
+the source. The constraint is set so that for every demand $d$ the set 
+
+$$\bigl\{\langle k, S_{dk} \rangle | S_{kd} \neq 0\bigr\} \eqmark$$
+
+\noindent forms a cycle in the graph. The capacity constraint for each node can be expressed with a cumulative constraint which uses two arguments, a set of task given by {\em start}, {\em duration}
+and {\em resource use} and a resource profile, given as a set of tuples {\em time point} and {\em resource limit}.
+
+$${\rm cumulative}\Bigl(\bigl\{\langle S_{id},1,bw(d)\rangle |d\in {\bf D}\bigr\},
+\bigl\{\langle l,m \rangle | 0 \leq l \leq n,m \bigr\}\Bigr) \eqmark$$
+
+\noindent
+
+$$\hbox{where }m = \cases{	\hfil\infty & $l=0$ \cr 
+				\hfil cap(e) & $\exists e\in {\bf E}, \hbox{ st. } source(i)=e, sink(e) = j$ \cr 
+				\hfil 0 & otherwise }$$
+
+This model needs $|{\bf D}|$ cycle constraints and $|{\bf N}|$ cumulative constraints to express the conditions of the routing problem.
+
+\begfigure
+\centerline{\inspic figs/model-constraint-node-1.pdf }\nobreak\medskip
+\label[fig:models:constraint-node]\caption/f Node-based constraint model. The constraint imposed in the equation \ref[models:eq:node] enforces that the nodes on the path forms a cycle -- each node is
+pointing to another node on the path and the destination node points to the origin point.
+\endfigure
+
+\sec Multicommodity flows
+
+As described in \cite[Leong1993], a multicommodity flows problem involves a simultaneous shipping of multiple commodities through a single network so that the total amount of flows on each edge is no bigger 
+than the capacity of the edge.
+
+
+We can formally describe the Multicommodity flows as follows: Given an undirected graph $G = (V,E)$ with a positive capacity $c(uv)$ for each edge $uv \in E$ and a set of commodities numbered $1$ through $k$, where each commodity $i$ is specified by a source-sink pair $s_i,t_i \in V$ and a positive demand $d_i$. For each commodity $i$, an amount proportional to its demand $d_i$ is shipped from its source
+$s_i$ to its sink $t_i$. This gives a {\em single commodity flow} $f_i$ specified by a set of edge flows $f_i(vw)$ on the edges $vw \in E$ where each edge has an arbitrary direction to keep track 
+of which way the flows travel across it. A positive edge flow $f_i(vw) > 0$ denotes a forward flow of commodity $i$ with respect to the direction of edge $vW$, while a negative flow $f_i(vw) < 0$ denotes a backwards flow. A {\em multicommodity flow} $f$ consists of $k$ single commodity flows, one for each commodity. In a multicommodity flow $f$, the total flow $f(vw)$ on each edge $vw \in E$ equals the
+sum $\sum_{i=1}^k{|f_i(vw)|}$ of the single commodity flows on that edge.
+
+\begfigure
+\centerline{\inspic figs/multiflows-1.pdf }\nobreak\medskip
+\label[fig:models:multiflows]\caption/f An example of multicommodity flows graph -- edges have capacities $c_1$ through $c_9$ and nodes $s_1$, $s_2$, $t_1$ and $t_2$ represent sources respectively sinks
+for two commodities. The dotted line represents a flow for a commodity 1 and a dashed line represents a flow for a commodity 2.
+\endfigure
 

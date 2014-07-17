@@ -2,14 +2,23 @@
 \input diplomka_style
 % \draft
 
+\citaceAPA
+
 \title={Algorithms for automated logistics}
 
-\margins/1 a4 (35,40,40,50)mm
+% \margins/1 a4 (35,40,40,50)mm
+\margins/1 a4 (40,25,25,25)mm
+
+\emergencystretch=1em
+
+\fixmnotes\left
+
+% \def\pozn#1{}
 
 \footline={}
 
 \begingroup \fourteenrm
-\centerline{Charles University in Prague}
+\centerline{\pozn{Gen.: \the\day. \the\month. \the\year}Charles University in Prague}
 \medskip
 \centerline{Faculty of Mathematics and Physics}
 \vfill
@@ -18,24 +27,31 @@
 \centerline{\picw=64mm \inspic mfflogo.pdf }
 \vfill
 \vskip5mm
-\centerline{\eighteenbf Bc. Michal Tul\'{a}\v{c}ek}
+\centerline{\eighteenbf Bc. Michal Tuláček}
 \vskip15mm
 \centerline{\eighteenbf \the\title}
 \vfill
 \centerline{Department of Theoretical Computer Science and Mathematical Logic}
 \vfill
 
-\+Supervisor of the master thesis:\qquad &prof. RNDr. Roman Bart\'{a}k, Ph.D.\cr
+\setbox0=\vbox{
+\+Supervisor of the master thesis: &prof. RNDr. Roman Barták, Ph.D.\cr
 \vskip5mm
-\+Study programme:&Computer science\cr
-\+Specialization:&Theoretical Computer Science\cr
+\+\hfill Study programme: &Computer science\cr
+\vskip5mm
+\+\hfill Specialization: &Theoretical Computer Science\cr
+}
+\centerline{\box0}
 \vfill
 \centerline{Prague 2014}
 \endgroup
 \eject
 
+\noindent I wish to thank my supervisor, prof. Roman Barták, for his invaluable advice and help. I am grateful for the experimental data provided by the Sunnysoft company, especially, my thanks go to Ing. David
+Šilhan and Ing. Martin Strouhal for their support and possibility to test the system in a real environment. My greatest thank-you belongs to you, my sweet Martina. Without your help, support and understanding,
+ I would have never finished this thesis.
 
-Thank you, thank you very much
+\vfill
 
 \eject
 
@@ -54,37 +70,47 @@ work as a school work pursuant to subsection 60 (1) of the Copyright Act.
 
 \vskip5mm
 
-\noindent Prague, 31$^{th}$ July 2014
+\noindent Prague, 31\st July 2014
 
 \vskip15mm
 
 \eject
-{\parskip=6pt
-Title: \the\title
+\parskip=6pt
+\bgroup\parindent=0pt
+{\chyph
+{\bf Název práce:} Algoritmy pro automatizovanou logistiku
 
-Author: Michal Tul\'{a}\v{c}ek
+{\bf Autor:} Michal Tuláček
 
-Department: Department of Theoretical Computer Science and Mathematical Logic
+{\bf Katedra:} Katedra teoretické informatiky a matematické logiky
 
-Supervisor: prof. RNDr. Roman Bart\'{a}k, Ph.D.
+{\bf Vedoucí diplomové práce:} prof. RNDr. Roman Barták, Ph.D.
 
-Abstract: ...
+{\bf Abstrakt:} Tématem práce je automatická logistika maloobchodního řetězce. Získané poznatky jsou aplikovány na reálný problém maloobchodní společnosti provozující elektronický obchod a několik poboček 
+v různých městech. V úvodní části je nejprve důkladně prostudován reálný problém řešený touto společností. Následně jsou prezentované současné trendy v oblasti řešení tohoto problému, zejména s 
+přihlédnutím k řešením vycházejících z problému směrování vozidel a z problémů s omezujícími podmínkami. Navržené řešení je podrobeno testům vycházejícím z dat ze skutečného provozu.
 
-Keywords: ...
-
-\vfil
-
-N\'{a}zev pr\'{a}ce: 
-
-Autor: Michal Tul\'{a}\v{c}ek}
-
-Vedouc\'{i} diplomov\'{e} pr\'{a}ce: prof. RNDr. Roman Bart\'{a}k, Ph.D.
-
-Abstrakt:
-
-Kl\'{i}\v{c}ov\'{a} slova:
+{\bf Klíčová slova:} automatická logistika, plánování, rozvrhování
+}
 
 \vfil
+
+{\bf Title:} \the\title
+
+{\bf Author:} Michal Tuláček
+
+{\bf Department:} Department of Theoretical Computer Science and Mathematical Logic
+
+{\bf Supervisor:} prof. RNDr. Roman Barták, Ph.D.
+
+{\bf Abstract:} The topic of this thesis is called algorithms for automated logistics. The gathered findings are applied on a real issue of a retail company running an electronic shop and a few branches 
+in several cities. In the introduction part, there is a thorough description of an actual problem that is being dealt with by this company. Consequently, contemporary trends in the area of 
+problem-solving of this issue is presented, especially regarding the answers to vehicle routings and issues with limiting conditions. The offered solution is subjected to tests arising from 
+the data collected from the real-time service.
+
+{\bf Keywords:} automated logistics, planning, scheduling
+    
+\vfil\egroup
 \eject
 
 {\chapfont\noindent Contents}
@@ -96,24 +122,26 @@ Kl\'{i}\v{c}ov\'{a} slova:
 \eject
 
 \footline={\hss\folio\hss}
-\def\zahlavi{\noindent{\it Bc. Michal Tul\'{a}\v{c}ek\kern3pt\headrule\kern3pt \the\title}}
-
+\def\zahlavi{\noindent{\it \kern3pt\headrule\kern3pt \the\title}}
 \input chaps/introduction
 \input chaps/problem-analysis
 \input chaps/models
 \input chaps/strategies
-\input chaps/problem-formulation
-\input chaps/problem-solution
-\input chaps/benchmarks
-\input chaps/discussion
+\input chaps/problem-model
+% \input chaps/basic-algorithm
+% \input chaps/problem-solution
+\input chaps/benchmarking
+%\input chaps/discussion
 \input chaps/conclusion
 
 \vfill\eject
-{\chapfont\noindent Bibliography}
-\bigskip
+{\sdef{mt:chap:en}{}\nonum\chap Bibliography\par}
+\makebib
 
-\usebibtex{diplomka}{apalike} 
-
-\vskip5mm
+\global\chapnum=0
+\input appendices/abbrev
+\input appendices/content-cd
+\input appendices/implementation
+\input appendices/data-files
 
 \bye
