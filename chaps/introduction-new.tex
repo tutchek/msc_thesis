@@ -1,0 +1,26 @@
+\newpage
+\chap Introduction
+
+In this thesis, we examine a real world problem of a retail company Sunnysoft. The company operates several stores around the Czech Republic and an electronic shop on the Internet.
+The customers can either order goods in the electronic shop, to be delivered with an external carrier company (Czech Post, DPD and so on) or they can book the goods in one of the shops.
+However, goods is distributed all around stores. Therefore, the company needs an efficient way to transfer goods from the store where the goods is available to the store where the goods
+is demanded. The company itself does not handle the transfers. Instead, it uses services of external delivery companies. Therefore, in practical case it is not limited by the capacity of transfer 
+routes (it should only notify the delivery company, that exceptionally, it has to use a truck). However, a store can be overloaded if we plan too many transfers which will be handled 
+in the store. 
+
+We review several approaches currently used in logistics. In particular, we present the approaches based on Vehicle routing problem, Constraint satisfaction problem and on Multicommodity flows problem.
+To solve the problem of Sunnysoft, we propose two different techniques. In the first one, we relate the problem to the problem of finding maximal flow through a network and propose an algorithm based
+on Ford-Fulkerson algorithm. In the second one, we formulate the problem as a CSP problem and use a state of the art solver to solve it.
+
+We compare the proposed techniques with the currently used algorithm. We focus on an overall duration of transfers and on an amount of transfers through stores. Each demand should be resolved as fast
+as possible, because there are customers waiting for the goods. If the demands are resolved too late, the customers can either cancel the order and order the goods elsewhere or they will be 
+displeased and will not buy the goods from the company. The amount of transfer through the store shall not exceed a particular limit. Otherwise, the store can overload and cease to function.
+
+First, we examine the given problem in chapter \ref[chap:analysis]. The retail company used several 
+algorithms, developed by the author of this thesis, to solve the problem. We review them in this chapter as well. Afterwards, we
+perform a research survey through logistics systems. In chapter \ref[chap:models] we review several models used in this field and in chapter \ref[chap:strategies] we show solution
+strategies for the described models. Next, in chapter \ref[chap:model] we formulate a model suitable for our problem. 
+To evaluate the proposed model, we construct a simulator system and use it to compare the model with the currently used algorithm. The benchmarks and their results are described in 
+chapter \ref[chap:benchmarking]. Finally, in chapter \ref[chap:conclusion] we discuss the achieved results.
+
+For the better reading experience, in the end of the thesis there is a list of used abbreviation.

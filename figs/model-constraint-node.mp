@@ -1,5 +1,5 @@
 prologues:=3;
-verbatimtex \input cs-pagella etex
+verbatimtex \input common etex
 
 beginfig(1)
 	u=2cm;

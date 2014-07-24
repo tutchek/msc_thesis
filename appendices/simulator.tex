@@ -1,0 +1,25 @@
+\newpage
+\label[ap:simulator]
+\appendix Description of a simulator
+
+As we described in chapter \ref[chap:analysis], the whole process is controlled by documents. Therefore, based on the data in ERP, we are able to establish the $InStock$ values for each store in any
+given moment. Moreover, we have the demands represented by shipment orders and also warehouse receipts which indicate if and when there was an increase in the amount of goods in a given store.
+
+In order to test our algorithm, we created a simulator which generates demands for the planner and applies the generated plan.
+
+\begitems \style N
+* {\em Intialization}. For a given date $d$, the simulator sets $Availability_{g,s} = InStock_{g,s}$ based on the history of stock supplies. Then it prepares a sequence of demands ${\bf D}$ and 
+a sequence of store replenishments ${\bf R}$, both ordered by date, where the date of the first element of both sequences is after $d$. We introduce a sequence of shedules ${\bf Sch} = \emptyset$.
+* {\em Pre-planning phase}. In this phase, the simulator sets $d'=d$ and increases $d$ by a predefined step. Then it constructs a sequence ${\bf D'} \subset {\bf D}$ of demands, which occurred since $d'$.
+Next, it updates an $Availability_{g,s}$ with replenishments from ${\bf R}$ which occurred since $d'$ and removes them from ${\bf R}$. Similarly, it processes schedules in ${\bf Sch}$. For each schedule
+$sch \in {\bf Sch}$ which is planned between $d'$ and $d$, the simulator lowers the corresponding $OnTheWay_{g,s}$ and increases $Availability_{g,s}$. Then it computes a set of shortest paths ${\bf P}$ 
+between the stores, with shipment time $d$.
+* {\em Planning}. The simulator runs the selected planner algorithm with ${\bf D'}$ and ${\bf P}$ as an input, producing a set of plans ${\bf Pl}$.
+* {\em Update phase}. Each plan $pl \in {\bf Pl}$ contains an information about the origin store $s_o$, the destination store $s_d$, goods to be transferred $s_o$, its $amount$ and a reference to 
+a demand $d$, which is resolved by the plan. According to the plan, the simulator decreases the requested amount of goods $g$ in $d$. If the demand $d$ is completely resolved, i.e. it does not demand
+any goods, it is removed from ${\bf D}$. Then it decreases $Availability_{g,s_o}$ and increases $OnTheWay_{g,s_d}$ by $amount$. Finally, it adds a new schedule to ${\bf Sch}$ for transfer of $amount$ 
+goods $g$ to store $s_d$ with a scheduled time based on the shortest path in ${\bf T}$ between $s_o$ and $s_d$. Afterwards, it continues with phase 2).
+\enditems
+
+
+

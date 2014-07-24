@@ -2,7 +2,7 @@
 
 \label[chap:models]
 
-\chap Existing models
+\chap Related research
 
 \pozn{zkontrolováno 15.7.}In this chapter, we will review useful models and techniques which will help us formulate a model for the problem described in chapter \ref[chap:analysis].
 
@@ -25,60 +25,84 @@ $({\bf V},\penalty0 {\bf M},\penalty0 {\bf P},\penalty0 l_0,\penalty0$ ${\bf P}_
 
 We require that $V, M, {\fam 0 and\ } P$ are disjoint, and that $(V, road(m))$ is an undirected graph for all $m \in M$ (i.e., for all $m \in M$, the relation $road(m)$ is symmetric and irreflexive).
 
-The paper classifies the transportation problems into groups by {\em capacity} value, {\em fuel units} and {\em mobiles} parameters as follows:
+\secc Vehicle routing problem
 
-\bigskip
+In logistics, there are widely used algorithms which can be classified as transportation problems. A large group of them is a variation to Vehicle routing problem (VRP\glos{VRP}{Vehicle routing 
+problem}). The problem was first defined as a Capacitated vehicle routing problem (cVRP \glos{cVRP}{Capacitated vehicle routing problem}) in \cite[Dantzig1959]. The problem problem solves a situation 
+when there is a need to plan routes of vehicles with a limited capacity from a central depot to destination depots. This problem is well researched and there exists many modifications to it.
 
-\hfil\table{|c|c|c|c|}{\crl
-\bf capacity & one portable & unbounded & varies \crli
-\bf fuel units & one per location & unbounded & varies \crli
-\bf mobiles & one mobile & one roadmap & many roadmaps \crl}
-\par\nobreak\medskip
-\caption/t Parameter values of the transportation problems according to classification of the problems.\par\bigskip
+In \cite[Braysy2005], there is defined a Vehicle routing problem with time windows (VRPTW\glos{VRPTW}{Vehicle routing problem with time windows}). The key difference to cVRP is that the depots
+can be serviced within a specified time interval or time window. This variation of VRP is widely used and well researched and there are available many heuristics to solve it. 
 
-\secc Vehicle routing problems (VRP)
+Another variation of VRP is a Stochastic vehicle routing problem (SVRP\glos{SVRP}{Stochastic vehicle routing problem}) As presented in \cite[Gendreau1996], stochastic vehicle routing problems 
+arise whenever some elements of the problem are random, for example stochastic demands or stochastic travel times. The paper describes an approach using stochastic programming. Such a stochastic 
+program is modelled in two stages -- the first is ``a priori'' solution and the second is a ``corrective action''.
+A stochastic program is usually modelled either as a {\em chance constrained program} (CCP\glos{CCP}{Chance constrained program}), where the solution is searched with respect to a particular threshold for a probability of a failure, or
+as a {\em stochastic program with recourse} (SPR\glos{SPR}{Stochastic program with recourse}) minimising the expected cost of the second stage solution plus the expected net cost of recourse.
+The SVRPs are usually modelled as mixed or pure integer stochastic programs or as Markov decision processes.
 
-\glos{VRP}{Vehicle routing problem}Vehicle routing problem is a transportation problem solving the need to visit a certain amount of destinations with a fleet of trucks. The vehicle routing problem 
-is {\it NP-hard} \cite[Lenstra1981]. Still, the vehicle routing problem is widely used in real applications and thus is well researched. Lots of usage examples are 
-discussed in \cite[Golden2001].
-
-\secc Capacitated vehicle routing problem (cVRP)
-
-\glos{cVRP}{Capacitated vehicle routing problem}As described in \cite[Dantzig1959], the capacitated vehicle routing problem (originally The Truck Dispatching Problem) may be defined as follows:
-
-\begitems \style N
-* Given a set of $n$ ``station points'' ${\bf P} = P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
-* A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between each pair of points $(i,j = 0, 1, \dots, n)$.
-* A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to each point $P_i\, (i=1,2,\dots,n)$.
-* The truck capacity is $C$, where $C > \max{q_i}$.
-* If $x_{ij} = x_{ji} = 1$ is interpreted to mean that points $P_i$ and $P_j$ are paired $(i,j = 0,1,\dots,n)$ and if $x_{ij} = x_{ji} = 0$ means that the points are not paired, one
-obtains the condition
-$$\sum_{j=0}^n{x_{ij}} = 1\quad (i=1,2,\dots,n)$$
-since every point $P_i$ is either connected with $P_0$ or at most with one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
-* The problem is to find those values of $x_{ij}$  which make the total distance
-$$D = \sum_{i,j=0}^{n}{d_{ij}x_{ij}}$$
-a minimum under the conditions specified in 2) to 5).
-\enditems
-
-\secc Vehicle routing problem with time windows (VRPTW)
-
-\glos{VRPTW}{Vehicle routing problem with time windows}The VRPTW can be according to \cite[Braysy2005] described as follows:
-
-\begitems \style N
-* Let $G=(V,E)$ be a connected directed graph consisting of a set of $n+1$ nodes, each of which can be serviced only within a specified time interval or time window and a set of non-negative weights,
-$d_{ij}$, and with associated travel times, $t_{ij}$.
-* The travel time, $t_{ij}$, includes a service time at node $i$, and a vehicle is permitted to arrive before the opening of the time window.
-* Node 0 represents the depot.
-* Each node $i$, apart from the depot, imposes a service requirement, $q_i$, that can be a delivery from or a pick-up for the depot.
-* The objective is to find the minimum number of tours, ${\bf K}^\hv$, for a set of identical vehicles such that each node is reached within the time window and the accumulated service up to any node
-does not exceed a positive number $Q$ (vehicle capacity).
-* A secondary objective can be imposed. It is either to minimize the total distance travelled or the duration of the routes.
-\enditems
-
-As the cited article states, the VRPTW is widely used and thus well researched problem. Moreover, there exists many heuristics to solve it.
+The most studied problem in this class is the {\em Vehicle Routing Problem with Stochastic Demands} (VRPSD\glos{VRPSD}{Vehicle Routing Problem with Stochastic Demands}). In this problem, customer demands are independent random variables.
+The next is the {\em Vehicle Routing Problem with Stochastic Customers} (VRPSC\glos{VRPSC}{Vehicle Routing Problem with Stochastic Customers}) with customers which are present with some probability but have deterministic demands. A combination of both
+previously mentioned problems is the Vehicle Routing Problem with Stochastic Customers and Demands (VRPSCD\glos{VRPSCD}{Vehicle Routing Problem with Stochastic Customers and Demands}). This problem is extremely hard to solve.
 
 
-\secc Stochastic vehicle routing (SVRP)
+
+%%--- zahodit ---
+
+%% The paper classifies the transportation problems into groups by {\em capacity} value, {\em fuel units} and {\em mobiles} parameters as follows:
+%% 
+%% \bigskip
+%% 
+%% \hfil\table{|c|c|c|c|}{\crl
+%% \bf capacity & one portable & unbounded & varies \crli
+%% \bf fuel units & one per location & unbounded & varies \crli
+%% \bf mobiles & one mobile & one roadmap & many roadmaps \crl}
+%% \par\nobreak\medskip
+%% \caption/t Parameter values of the transportation problems according to classification of the problems.\par\bigskip
+%% 
+%% \secc Vehicle routing problems (VRP)
+%% 
+%% \glos{VRP}{Vehicle routing problem}Vehicle routing problem is a transportation problem solving the need to visit a certain amount of destinations with a fleet of trucks. The vehicle routing problem 
+%% is {\it NP-hard} \cite[Lenstra1981]. Still, the vehicle routing problem is widely used in real applications and thus is well researched. Lots of usage examples are 
+%% discussed in \cite[Golden2001].
+%% 
+%% \secc Capacitated vehicle routing problem (cVRP)
+%% 
+%% \glos{cVRP}{Capacitated vehicle routing problem}As described in \cite[Dantzig1959], the capacitated vehicle routing problem (originally The Truck Dispatching Problem) may be defined as follows:
+%% 
+%% \begitems \style N
+%% * Given a set of $n$ ``station points'' ${\bf P} = P_i\, (i = 1, 2, \dots, n)$, to which deliveries are made from point $P_0$, called the ``terminal'' 
+%% * A ``Distance Matrix'' $[D] = [d_{ij}]$ is given which specifies the distance $d_{ij} = d_{ji}$ between each pair of points $(i,j = 0, 1, \dots, n)$.
+%% * A ``Delivery Vector'' $(Q) = (q_i)$ is given which specifies the amount $q_i$ to be delivered to each point $P_i\, (i=1,2,\dots,n)$.
+%% * The truck capacity is $C$, where $C > \max{q_i}$.
+%% * If $x_{ij} = x_{ji} = 1$ is interpreted to mean that points $P_i$ and $P_j$ are paired $(i,j = 0,1,\dots,n)$ and if $x_{ij} = x_{ji} = 0$ means that the points are not paired, one
+%% obtains the condition
+%% $$\sum_{j=0}^n{x_{ij}} = 1\quad (i=1,2,\dots,n)$$
+%% since every point $P_i$ is either connected with $P_0$ or at most with one other point $P_j$. Furthermore, by definition, $x_{ii} = 0$ for every $i = 0, 1, \dots, n$.
+%% * The problem is to find those values of $x_{ij}$  which make the total distance
+%% $$D = \sum_{i,j=0}^{n}{d_{ij}x_{ij}}$$
+%% a minimum under the conditions specified in 2) to 5).
+%% \enditems
+%% 
+%% \secc Vehicle routing problem with time windows (VRPTW)
+%% 
+%% \glos{VRPTW}{Vehicle routing problem with time windows}The VRPTW can be according to \cite[Braysy2005] described as follows:
+%% 
+%% \begitems \style N
+%% * Let $G=(V,E)$ be a connected directed graph consisting of a set of $n+1$ nodes, each of which can be serviced only within a specified time interval or time window and a set of non-negative weights,
+%% $d_{ij}$, and with associated travel times, $t_{ij}$.
+%% * The travel time, $t_{ij}$, includes a service time at node $i$, and a vehicle is permitted to arrive before the opening of the time window.
+%% * Node 0 represents the depot.
+%% * Each node $i$, apart from the depot, imposes a service requirement, $q_i$, that can be a delivery from or a pick-up for the depot.
+%% * The objective is to find the minimum number of tours, ${\bf K}^\hv$, for a set of identical vehicles such that each node is reached within the time window and the accumulated service up to any node
+%% does not exceed a positive number $Q$ (vehicle capacity).
+%% * A secondary objective can be imposed. It is either to minimize the total distance travelled or the duration of the routes.
+%% \enditems
+%% 
+%% As the cited article states, the VRPTW is widely used and thus well researched problem. Moreover, there exists many heuristics to solve it.
+%% 
+%% 
+%% \secc Stochastic vehicle routing (SVRP)
 
 \glos{SVRP}{Stochastic vehicle routing problem}As presented in \cite[Gendreau1996], stochastic vehicle routing problems arise whenever some elements of the problem are random, for example stochastic demands or stochastic travel times.
 The paper describes an approach using stochastic programming. Such a stochastic program is modelled in two stages -- the first is ``a priori'' solution and the second is a ``corrective action''.
@@ -109,15 +133,11 @@ previously mentioned problems is the Vehicle Routing Problem with Stochastic Cus
 % 
 % which means that there is one depot, $m$ vehicles each with the capacity $cap$ and the objective function is a sum of route durations.
 
-\sec Scheduling
-
-\secc Vehicle routing problem as a job scheduling problem
+\secc Scheduling
 
 In \cite[Beck2002] the VRP is reformulated as a scheduling problem. However, these reformulations do not have the same performance. As described in \cite[Beck2003], in an optimisation task,
 the VRP is better in minimising the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
 significantly worse than the scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
-
-\secc Daily aircraft routing and scheduling problem (DA\-RSP)
 
 Different approach represents the DARSP\glos{DARSP}{Daily aircraft routing and scheduling problem} described in \cite[Desaulniers1997]. The problem is to generate a schedule for a heterogeneous aircraft fleet covering a set of operational flight legs 
 with known departure time windows, durations and profits according to the aircraft type. In the cited paper the problem is defined as follows: {\it ``Given a heterogeneous aircraft fleet, a set
@@ -128,13 +148,243 @@ In the paper there are two formulations of the DARSP. The first is based as a Se
 formulation. For each of the formulations, the paper propose a solution strategy. For the Set Partitioning approach the branch-and-bound strategy is feasible and for the multi-commodity network flow
 the Dantzing-Wolfe or Lagrangean relaxation embedded in a branch-and-bound search tree.
 
+\secc Solution strategies
+
+\secc Tabu search
+
+A Tabu search, as presented in \cite[Glover1989,Glover1990a,Glover1990] 
+is a solution strategy for solving combinatorial optimization problems. It can be used to solve 
+a wide range of problems from graph theory and matroid settings to general pure and mixed integer programming problems. The combinatorial optimization problem is formulated as follows: 
+
+$${\fam0 Minimize:}\quad c(x): x \in {\bf X}\quad {\fam0 in}\, {\bbchar R}_n,$$
+
+where the function $c(x)$ is a function (linear or non-linear) and the condition $x\in X$ is assumed to constrain the specified components of $x$ to discrete values. The Tabu search itself 
+can be defined as follows:
+
+\begitems \style N
+* Select an initial $x\in {\bf X}$ and let $x^\hv := x$. Set the iteration counter $k = 0$ and begin with ${\bf T}$ empty.
+* If $S(x)\setminus {\bf T}$ is empty, go to Step 4. Otherwise, set $k := k+1$ and select $s_k \in S(x) \setminus T$ such that $s_k(x) = {\rm OPTIMUM}(s(x) : s \in S(x) \setminus T)$.
+* Let $x := s_k(x)$. If $c(x) < c(x^\hv)$, where $x^\hv$ denotes the best solution currently found, let $x^\hv := x$.
+* If a chosen number of iterations has elapsed either in total or since $x^\hv$ was last improved, or if $S(x) \setminus {\bf T} = \emptyset$ upon reaching this step directly from Step 2, stop.
+Otherwise update ${\bf T}$ (as subsequently identified) and return to Step~2.
+\enditems
+
+\secc Parallel savings based heuristics
+
+In \cite[Altinkemer1991], there is presented an approach based on weighted matching problem. The paper defines three versions of the algorithm -- a PSA1\glos{PSA1--3}{Parallel savings based heuristics algorithms}, which is not polynomial, a PSA2, which is fully
+polynomial with a time complexity of $O(n^3)$. Finally, a PSA3 algorithm is an improvement of PSA2, which is not polynomial as well.
+
+First we will introduce the notation used in the description of the algorithm:
+
+
+\begitems
+* $n$ is the number of nodes in the problem,
+* ${\bf V}$ is the node set of the graph, $V = \{1, \dots, n\}$,
+* $Q$ is the vehicle capacity,
+* $d_i$ is the load to be delivered to node $i$ ($d_1 = 0$),
+* ${\bf R}_p$ is the set of nodes in cluster $p$; this is the set of nodes assigned to vehicle $p$,
+* $C({\bf R}_p)$ is the cost of the optimum travelling salesman tour over ${\bf R}_p$ and node ${\bf 1}$ (the depot),
+* $S_{pq}$ is the savings obtained by merging clusters $p$ and $q$,
+* ${\bf M}_i$ is a set of dummy nodes added to the network at iteration $i$; $|{\bf M}_i| = n - (i+1)T$ and $2 \leq T \leq 12$,
+* $p_f$ is the first endpoint of the tour in cluster $p$,
+* $p_l$ is the last endpoint of the tour in cluster $p$,
+\enditems
+
+The PSA1 algorithm is defined as follows:
+
+\begitems \style N
+* {\em (Initialization)} For $p = 1, \dots, n$, set ${\bf R}_p = \{p\}$, $i = 1$, ${\bf V}_0 = {\bf V}$, and choose a value for $T$.
+* Form the dummy node set ${\bf M}_i$, such that $|{\bf M}_i| = n - (i+1)T$. For every $p$ and $q$, $p<q$ do
+
+$$S_{pq} = \cases{0 & $p<q$ and $p,q \in {\bf M}_i$\cr -\infty & $p<q$ and $p\in {\bf V}_{i-1}$ and $q\in {\bf M}_i$}$$
+
+\noindent For every $p$ and $q$, $p<q$ and $p, q \in {\bf V}_{i-1}$ do:
+
+\begitems \style a
+* If $\sum_{j\in {\bf R}_p \cup {\bf R}_q}{d_j} > Q$ go to the next combination of $p$ and $q$.
+* Otherwise, compute $S_{pq}$ according to the formula
+
+$S_{pq} = \cases{0 & if $p=1$, $q=1, \dots, |{\bf V}_{i-1}|$\cr C({\bf R}_p) + C({\bf R}_q) - C({\bf R}_p \cup {\bf R}_q) & otherwise}$
+\enditems
+
+* Solve the maximum weighted matching problem with ${\bf V}_{i-1}\cup {\bf M}_i$ as its node set, and $S_{pq}$ as the cost entry for arc $(p,q)$. Merge clusters $p$ and $q$ if arc $(p,q)$ is in the matching cluster
+and $p,q \in {\bf V}_{i-1}$ unless either $p$ or $q$ is node ${\bf 1}$.
+* If all mergers are non-admissible STOP, otherwise increase $i$ by one, update ${\bf V}_i$ to include all clusters and go to {\em Step 2}.
+\enditems
+
+Since the computation of $S_{pq}$ in {\em Step 2} involves solving of the optimum travelling salesman tour, it is not a polynomial algorithm. Therefore, a different formula is used for PSA2 and PSA3:
+
+$$S_{pq} = \max\cases{
+	c_{1p_f} + c_{1q_f} - c_{p_f q_f} \cr 
+	c_{1p_f} + c_{1q_l} - c_{p_l q_l} \cr
+	c_{1p_l} + c_{1q_l} - c_{p_l q_l} \cr
+	c_{1p_l} + c_{1q_f} - c_{p_l q_f}
+}$$
+
+In PSA3, after the final clusters are formed using PSA2, a TSP is solved for each final cluster formed. The tour generated by the optimal travelling salesman tour of that cluster is selected as 
+the solution for that cluster.
+
+\secc Monte Carlo Tree Search
+
+Monte Carlo Tree Search is a stochastic optimization algorithm combining classical tree search with random sampling of the search space. In \cite[Trunda2013] the MCTS\glos{MCTS}{Monte Carlo Tree Search} is used to solve
+planning problems in transportation domains.
+
+The MCTS algorithm builds an asymmetric tree to represent the search space by repeatedly performing four steps, which are illustrated on the figure \ref[fig:strategies:mcts]
+
+\begitems \style N
+* {\em Selection} -- the tree is traversed from the root to a leaf using some criterion called {\em tree policy} to select the most urgent leaf.
+* {\em Expansion} -- all applicable actions for the selected leaf node are applied and the resulting states are added to the tree as successors of the selected node.
+* {\em Simulation} -- a pseudo-random simulation is run from the selected node until some final state is reached. During the simulation the simulation the actions are selected by a {\em
+simulation policy}.
+* {\em Update/Back-propagation} -- the result of the simulation is propagated back in the tree from the selected node to the root and statistics of the nodes on this path are updated 
+according to the result.
+\enditems
+
+\begfigure
+\centerline{\inspic figs/strategies-mcts-1.pdf }\nobreak\medskip
+\label[fig:strategies:mcts]\caption/f Basic schema of MCTS from \cite[Chaslot2006]
+\endfigure
+
+The MCTS was originally formulated in \cite[Chaslot2006] for the purposes of a game AI. However, as presented in \cite[Trunda2013], it is suitable for solving of planning problems.
+In such a case the planning task is transformed to the problem of finding a shortest path in an implicitly given state space, where transitions/moves between the states are
+defined by the actions. Though, classical path-finding techniques cannot be applied there because the state space is enormous.
+
+The paper identifies a problem with the infiniteness of paths in the state space. Since most of the actions are reversible, there are cycles and even finite state space does not assure
+that paths will be finite. There are specified three possible threats -- cycles in the state space, dead ends and dead components -- with possible ways to solve them.
+
+
+\secc Branch and bound approach to solve VRP
+
+``Branch and bound'' is a general algorithm for finding optimal solutions of optimization problems first described in \cite[Land1960] in 1960. The algorithm uses two tools, a splitting procedure and a bounds
+procedure. The algorithm systematically enumerates possible solutions and use the upper and lower bounds to discard solutions which are not feasible. Therefore, there is no need to explore whole state
+space to find a feasible solution.
+
+In a survey paper \cite[Toth2002], there are presented several bounds procedures for cVRP problems. The paper presents a difference between symmetric cVRP (scVRP\glos{scVRP}{Symmetric cVRP}) and asymmetric cVRP (acVRP\glos{acVRP}{Asymmetric cVRP}) and propose different
+bounds procedures for each of them. The cVRP is asymmetric if it has an asymmetric cost matrix. Otherwise, the cVRP is symmetric. The benchmarks showed, that the best bounds procedure for an acVRP is 
+based on the additive approach which considers, in sequence, different infeasible arc subsets so as to produce a possibly better overall lower bound. Likewise, for the scVRP the benchmarks shows
+that the best bounds procedure is based on $b$-matching, which is a counterpart for the symmetric version of the assignment relaxation for acVRP -- a bounds procedure based on transforming of the cVRP
+to the assignment problem.
+
+
+\sec Branch and cut algorithm
+
+A slightly different approach than branch and bound is the ``branch and cut algorithm'', described in detail in \cite[Padberg1991]. First, the problem is formulated as a linear programming 
+problem. Then, a solution is found. If the solution is not integer, the algorithm either splits one variable or adds a cutting plane. 
+
+We will demonstrate this technique on an example from \cite[Mitchell2002]:
+
+Let have an integer programming problem
+
+\label[strategies:branch-and-cut:eq0]
+$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
+\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\cr
+ & -x_1 & + & 2x_2 & \leq & 5\cr
+ & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
+
+First the algorithm solves the linear programming relaxation, giving the point $(2{3 \over 7}, 3{5 \over 7})$, with value $-33{1 \over 7}$. The algorithm has now a choice -- it can divide the problem to
+two problems by splitting on a variable or add a cutting plane, for example $x_1 + x_2 \leq 5$.
+
+\begfigure
+\centerline{\inspic figs/strategies-branch-and-cut-1.pdf }\nobreak\medskip
+\label[fig:strategies:branch-and-cut]\caption/f Branch-and-cut example from \cite[Mitchell2002]. The dots represents possible integer solutions, the dashed line is the convex hull of the integer points. The grayed area is a polyhedron used for linear programming if we ignore the integrality restrictions.
+\endfigure
+
+If the algorithm splits on $x_1$, two new problems are obtained:
+
+\label[strategies:branch-and-cut:eq1]
+$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
+\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill\cr
+ & -x_1 & + & 2x_2 & \leq & 5\hfill\cr
+ & {\bf x_1} & & & \geq & {\bf 3}\hfill\cr 
+ & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
+
+\noindent and
+
+\label[strategies:branch-and-cut:eq2]
+$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
+\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill\cr
+ & -x_1 & + & 2x_2 & \leq & 5\hfill\cr
+ & {\bf x_1} & & & \leq & {\bf 2}\hfill\cr 
+ & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
+
+The optimal solution to the original problem will be the better of the solutions to these two subproblems. The solution to the linear programming relaxation of \ref[strategies:branch-and-cut:eq1] is 
+$(3,2)$, with value $-28$. This solution is integral, so it solves \ref[strategies:branch-and-cut:eq1], and becomes the incumbent best known feasible solution. The LP relaxation of 
+\ref[strategies:branch-and-cut:eq2] has optimal solution $(2,3.5)$, with value $-29.5$. This point is non-integral, so it does not solve \ref[strategies:branch-and-cut:eq2], and it must be attacked 
+further.
+
+Assume the algorithm uses a cutting plane approach and adds the inequality  $2x_1+x_2\leq 7$ to \ref[strategies:branch-and-cut:eq2]. This is a valid inequality, in that it is satisfied by every 
+integral point that is feasible in \ref[strategies:branch-and-cut:eq2]. Further, this inequality is violated by $(2,3.5)$, so it is a cutting plane. The resulting subproblem is 
+
+\label[strategies:branch-and-cut:eq3]
+$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
+\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill \cr
+ & -x_1 & + & 2x_2 & \leq & 5\hfill \cr
+ & x_1 & & & \leq & 2\hfill \cr 
+ & {\bf 2x_1} & {\bf +} & {\bf x_2} & \leq & {\bf 7}\hfill \cr 
+ & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
+
+The LP relaxation of \ref[strategies:branch-and-cut:eq3] has optimal solution $(1.8,3.4)$, with value $-27.8$. Notice that the optimal value for this modified relaxation is larger than the value 
+of the incumbent solution. The value of the optimal integral solution to the second subproblem must be at least as large as the value of the relaxation. Therefore, the incumbent solution $(3,2)$ is 
+better than any feasible integral solution for \ref[strategies:branch-and-cut:eq3], so it actually solves the original problem.
+
+\begfigure
+\centerline{\inspic figs/strategies-branch-and-cut-2.pdf }\nobreak\medskip
+\label[fig:strategies:branch-and-cut:2]\caption/f Progress of branch-and-cut on the two dimensional integer programming problem from \cite[Mitchell2002].
+\endfigure
+
+\begfigure
+\centerline{\inspic figs/strategies-branch-and-cut-3.pdf }\nobreak\medskip
+\label[fig:strategies:branch-and-cut:3]\caption/f Three steps of the algorithm branch-and-cut.
+\endfigure
+
+The branch-and-cut approach was applied to the VRP in \cite[Bard1998]. In the concrete, they used this approach to solve yhe Vehicle routing problem with satellite facilities (VRPSF).  
+Their approach constists of the following steps:
+
+\begitems \style N
+* {\em (Preprocessing)} Set up directed graph and sparsify.
+* {\em (Upper bound)} Obtain an upper bound on the MILP objective function by running a heuristic to find a feasible solution.
+* {\em (Lower bound)} Solve the LP relaxation of the VRPSF.
+* {\em (Optimality check)} If the optimality conditions are satisfied go to Step 8; otherwise go to Step 4.
+* {\em (Variable fixing)} Determine if any binary variables can be fixed at zero or one.
+* {\em (Cut generation)} Solve the separation problem to generate valid inequalities. If no such inequalities can be identified go to Step 7; otherwise go to Step 2.
+* {\em (Branching)} Create a new node in the search tree following the logic of branch and bound. If branching is not possible, go to Step 8; otherwise go to Step 2.
+* {\em (Desparsification)} If no sparsified variables remain fixed at zero, stop and declare the incumbent the optimal solution to the MILP. Otherwise, introduce a subset of the sparsfied variables whose
+reduced costs are negative back into model and go to Step 2.
+\enditems
+
+\secc Transportation problem and ALP
+
+The transportation problems do not fit well with ALP. The key feature of a transportation problem is a fleet of vehicles with a limited capacity. However, in ALP there is no such condition. 
+In ALP-lp, stores have a limited capacity. However, the stores corresponds to locations in vehicle routing problems. On the other hand, in ALP and ALP-lp, there is no capacity constraint 
+to the delivery routes. They are provided by outsources delivery companies and are in a practical case unlimited.
+
 % \sec Commodity flow problems
 % 
 % In this section we will discuss problems which are based on network flows in a graph. First, we will focus on the constraint programming formulations of such problems. Afterwards, we will present
 % a generalisation of network flows -- multi-commodity flows.
 
+\sec Network flows
+
+A different approach represents graph algorithms. The task of ALP is to distribute optimally goods from one store to another. This resembles network flows problem, which aims to find a maximal flow
+in a given network. Finding of a maximal flow is not a hard problem. However, if we generalize the problem and try to search a maximal flow for more than one flow, the problem becomes NP-hard.
+As described in \cite[Leong1993], a multicommodity flows problem involves a simultaneous shipping of multiple commodities through a single network so that the total amount of flows on each edge is no bigger than the capacity of the edge.
+
+
+We can formally describe the Multicommodity flows as follows: Given an undirected graph $G = (V,E)$ with a positive capacity $c(uv)$ for each edge $uv \in E$ and a set of commodities numbered $1$ through $k$, where each commodity $i$ is specified by a source-sink pair $s_i,t_i \in V$ and a positive demand $d_i$. For each commodity $i$, an amount proportional to its demand $d_i$ is shipped from its source
+$s_i$ to its sink $t_i$. This gives a {\em single commodity flow} $f_i$ specified by a set of edge flows $f_i(vw)$ on the edges $vw \in E$ where each edge has an arbitrary direction to keep track 
+of which way the flows travel across it. A positive edge flow $f_i(vw) > 0$ denotes a forward flow of commodity $i$ with respect to the direction of edge $vW$, while a negative flow $f_i(vw) < 0$ denotes a backwards flow. A {\em multicommodity flow} $f$ consists of $k$ single commodity flows, one for each commodity. In a multicommodity flow $f$, the total flow $f(vw)$ on each edge $vw \in E$ equals the
+sum $\sum_{i=1}^k{|f_i(vw)|}$ of the single commodity flows on that edge.
+
+\begfigure
+\centerline{\inspic figs/multiflows-1.pdf }\nobreak\medskip
+\label[fig:models:multiflows]\caption/f An example of multicommodity flows graph -- edges have capacities $c_1$ through $c_9$ and nodes $s_1$, $s_2$, $t_1$ and $t_2$ represent sources respectively sinks
+for two commodities. The dotted line represents a flow for a commodity 1 and a dashed line represents a flow for a commodity 2.
+\endfigure
+
 \label[sec:models:networks]
-\sec Constraint programming problems in networks
+\sec Constraint programming
+
+\secc Constraint programming problems in networks
 
 As described in \cite[Simonis2006], the problems in networks can be easily modelled using a constraint programming. There are three usual types of the model -- a link-based model, a path-based model
 and a node-based model. 
@@ -228,20 +478,5 @@ This model needs $|{\bf D}|$ cycle constraints and $|{\bf N}|$ cumulative constr
 pointing to another node on the path and the destination node points to the origin point.
 \endfigure
 
-\sec Multicommodity flows
-
-As described in \cite[Leong1993], a multicommodity flows problem involves a simultaneous shipping of multiple commodities through a single network so that the total amount of flows on each edge is no bigger 
-than the capacity of the edge.
-
-
-We can formally describe the Multicommodity flows as follows: Given an undirected graph $G = (V,E)$ with a positive capacity $c(uv)$ for each edge $uv \in E$ and a set of commodities numbered $1$ through $k$, where each commodity $i$ is specified by a source-sink pair $s_i,t_i \in V$ and a positive demand $d_i$. For each commodity $i$, an amount proportional to its demand $d_i$ is shipped from its source
-$s_i$ to its sink $t_i$. This gives a {\em single commodity flow} $f_i$ specified by a set of edge flows $f_i(vw)$ on the edges $vw \in E$ where each edge has an arbitrary direction to keep track 
-of which way the flows travel across it. A positive edge flow $f_i(vw) > 0$ denotes a forward flow of commodity $i$ with respect to the direction of edge $vW$, while a negative flow $f_i(vw) < 0$ denotes a backwards flow. A {\em multicommodity flow} $f$ consists of $k$ single commodity flows, one for each commodity. In a multicommodity flow $f$, the total flow $f(vw)$ on each edge $vw \in E$ equals the
-sum $\sum_{i=1}^k{|f_i(vw)|}$ of the single commodity flows on that edge.
-
-\begfigure
-\centerline{\inspic figs/multiflows-1.pdf }\nobreak\medskip
-\label[fig:models:multiflows]\caption/f An example of multicommodity flows graph -- edges have capacities $c_1$ through $c_9$ and nodes $s_1$, $s_2$, $t_1$ and $t_2$ represent sources respectively sinks
-for two commodities. The dotted line represents a flow for a commodity 1 and a dashed line represents a flow for a commodity 2.
-\endfigure
+\sec Mixed integer programming
 
