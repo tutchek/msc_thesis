@@ -1,26 +1,32 @@
 \newpage
 \chap Introduction
 
-In this thesis, we examine a real world problem of a retail company Sunnysoft. The company operates several stores around the Czech Republic and an electronic shop on the Internet.
+\pozn{Zkontrolovano: ne}In this thesis, we examine a real world problem of a retail company Sunnysoft. The company operates several stores around the Czech Republic and an electronic shop on the Internet.
 The customers can either order goods in the electronic shop, to be delivered with an external carrier company (Czech Post, DPD and so on) or they can book the goods in one of the shops.
 However, goods is distributed all around stores. Therefore, the company needs an efficient way to transfer goods from the store where the goods is available to the store where the goods
 is demanded. The company itself does not handle the transfers. Instead, it uses services of external delivery companies. Therefore, in practical case it is not limited by the capacity of transfer 
 routes (it should only notify the delivery company, that exceptionally, it has to use a truck). However, a store can be overloaded if we plan too many transfers which will be handled 
 in the store. 
 
-We review several approaches currently used in logistics. In particular, we present the approaches based on Vehicle routing problem, Constraint satisfaction problem and on Multicommodity flows problem.
-To solve the problem of Sunnysoft, we propose two different techniques. In the first one, we relate the problem to the problem of finding maximal flow through a network and propose an algorithm based
-on Ford-Fulkerson algorithm. In the second one, we formulate the problem as a CSP problem and use a state of the art solver to solve it.
+Afterwards, we propose a formal description of the examined problem, an {\em Automated logistics problem} (ALP) and its variant {\em Automated logistics problem with low-priority demands} (ALP-lp) which 
+prevents overloading of stores\pozn{Pokud zustane ALP-lp2, tak ho sem pripsat...}.
 
-We compare the proposed techniques with the currently used algorithm. We focus on an overall duration of transfers and on an amount of transfers through stores. Each demand should be resolved as fast
-as possible, because there are customers waiting for the goods. If the demands are resolved too late, the customers can either cancel the order and order the goods elsewhere or they will be 
-displeased and will not buy the goods from the company. The amount of transfer through the store shall not exceed a particular limit. Otherwise, the store can overload and cease to function.
+We review several approaches currently used in logistics, which could be used to solve ALP or ALP-lp. In particular, we present the approaches based on Vehicle routing problem, network flows,
+constraint programming and mixed integer programming.
 
-First, we examine the given problem in chapter \ref[chap:analysis]. The retail company used several 
-algorithms, developed by the author of this thesis, to solve the problem. We review them in this chapter as well. Afterwards, we
-perform a research survey through logistics systems. In chapter \ref[chap:models] we review several models used in this field and in chapter \ref[chap:strategies] we show solution
-strategies for the described models. Next, in chapter \ref[chap:model] we formulate a model suitable for our problem. 
-To evaluate the proposed model, we construct a simulator system and use it to compare the model with the currently used algorithm. The benchmarks and their results are described in 
+To solve the problem of Sunnysoft, we propose three different techniques. In the first one, we relate the problem to the problem of finding maximal flow through a network and propose an algorithm based
+on Ford-Fulkerson algorithm. In the second one, we formulate the problem as a constraint satisfaction problem. Finally, in the third technique we formulate the problem as a mixed integer programming 
+problem. We use state of the art solvers to solve the constraint satisfaction based problem and the mixed integer programming problem.
+
+We perform benchmarking of the proposed algorithms. We perform a qualitative analysis of the solvers and compare the generated plans. We compare the methods with a na\I ve algorihm as well. We focus on an overall duration of transfers and on an amount of transfers through stores. Each demand should be resolved as fast
+as possible, because there are customers waiting for the goods. If the demands are resolved too late, the customers can either cancel the order and order the goods elsewhere or they will be
+displeased and will not buy the goods from the company in the future. The amount of transfer through the store shall not exceed a particular limit. Otherwise, the store can overload and cease to function.
+
+Simultaneously, we perform a perform a performance analysis and compare the techniques based on their running time and memory consumption while varying their parameters.
+
+First, we examine the given problem in detail in chapter \ref[chap:analysis]. Afterwards, we formalize an Automated logistics problem and its variant. In chapter \ref[chap:models] we review several
+models used in automated logistics and evaluate their ability to solve the problems. Next, in chapter \ref[chap:model] we state algorithms which solve the defined problems.
+To evaluate the proposed models, we construct a simulation system and perform experiments on the proposed algorithms. The benchmarks and their results are described in 
 chapter \ref[chap:benchmarking]. Finally, in chapter \ref[chap:conclusion] we discuss the achieved results.
 
 For the better reading experience, in the end of the thesis there is a list of used abbreviation.

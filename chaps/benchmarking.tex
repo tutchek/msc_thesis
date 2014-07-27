@@ -3,10 +3,12 @@
 \label[chap:benchmarking]
 \chap Benchmarking
 
+\sec Qualitative analysis
+
 \pozn{Zkontrolovano 15.7.}To evaluate the model proposed in the previous chapter, we compare it with the algorithm described in chapter \ref[chap:analysis]. We perform tests on real data collected during fiscal year 07/2013---06/2014.
 
 
-\sec Description of the benchmarks
+\secc Description of the benchmarks
 
 We test the model on data from 1\st November to 24\th December 2013. Due to the increased pre-Christmas demand rate, this period is the most challenging part of the year. We run the 
 simulations with the CSP model, described in Chapter \ref[chap:model], Na\"{\i}ve algorithm described in section \ref[secc:analysis:naive] and Ford-Fulkerson based algorithm in section
@@ -63,7 +65,7 @@ $$Demanded_{g,d} = DesiredAmount_g.$$
 To compute a set of paths ${\bf P}$ between the stores, we use a Dijkstra's algorithm \cite[Dijkstra1959] on a directed graph displayed on Figure \ref[fig:benchmarking:deliveries]. The paths
 are computed for each run once again, since the shortest path depends on a current simulation's date and time. The lengths of paths are computed using the Algorithm \ref[alg:algorithm:delivery-time].
 
-\sec Experimental results
+\secc Experimental results
 
 \hfil\table{|l|c|c|c|}{\crl
  & \bf Na\I ve & \bf FF & \bf CSP  \crli
@@ -79,5 +81,9 @@ $\downarrow\alpha$ / $\beta \to$ & 0 & 1 & 10 & 100 \crli
 1 & & & & \crl
 10 & & & & \crl
 100 & & & & \crli}
+
+\sec Performance analysis
+
+
 \sec Discussion
 

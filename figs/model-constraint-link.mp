@@ -2,6 +2,7 @@ prologues:=3;
 verbatimtex \input common etex
 
 u = 1cm;
+v = 0.5mm;
 
 
 beginfig(1);
@@ -16,7 +17,7 @@ beginfig(1);
 	pickup defaultpen;
 	draw z0--z1; draw z0--z2; draw z0--z3; draw z0--z4; draw z0--z5;
 
-	pickup pencircle scaled 0.3mm;
+	pickup pencircle scaled v;
 	drawarrow z0--z1;
 
 	label.bot(btex Origin node etex, z2);
@@ -35,7 +36,7 @@ beginfig(2);
 	pickup defaultpen;
 	draw z0--z1; draw z0--z2; draw z0--z3; draw z0--z4; draw z0--z5;
 
-	pickup pencircle scaled 0.3mm;
+	pickup pencircle scaled v;
 	drawarrow z4--z0;
 	drawarrow z0--z2;
 
@@ -55,7 +56,7 @@ beginfig(3);
 	pickup defaultpen;
 	draw z0--z1; draw z0--z2; draw z0--z3; draw z0--z4; draw z0--z5;
 
-	pickup pencircle scaled 0.3mm;
+	pickup pencircle scaled v;
 	drawarrow z3--z0;
 
 	label.bot(btex Destination node etex, z2);

@@ -4,7 +4,7 @@
 
 \chap Problem analysis
 
-\pozn{Zkontrolovano 14.7.}In this chapter, we will discuss the problem outlined in the previous chapter. Our goal is to describe the process in such a way to be able to formulate a formalization out of it. The analysis
+\pozn{Zkontrolovano: ne}In this chapter, we will discuss the problem outlined in the previous chapter. Our goal is to describe the process in such a way to be able to formulate a formalization out of it. The analysis
 is based on a real situation in the retail store company called Sunnysoft, which uses the ERP\glos{ERP}{Enterprise resource planning software}\fnote{Enterprise resource planning is a business management software -- usually a suite of integrated applications -- that
 a company can use to store and manage data from every stage of its business.} software Helios.
 
@@ -47,8 +47,8 @@ is performed with shipment orders. We define a variable {\em Availability} as fo
 
 $$Availability_{g,s} = InStock_{g,s} - \sum_{so \in SO_s}{\left( \mathbox{\# of unhandled items of $g$ on $so$} \right)},$$
 
-\noindent where $g$ and $s$ have the same meaning as mentioned above and $SO_s$ is a set of shipment orders in the store $s$. As we can see, the availability can be negative, i.e. the demand for an article might be larger 
-than the amount on that particular store and therefore, the article needs to be transferred from another store or ordered from the supplier.
+\noindent where $g$ and $s$ have the same meaning as mentioned above and $SO_s$ is a set of shipment orders in the store $s$. As we can imagine, the availability can be negative, i.e. the demand for an article might be larger 
+than the amount in that particular store and therefore, the article needs to be transferred from another store or ordered from the supplier.
 
 This model has one disadvantage, which can lead to the irregularity described in section \ref[sec:analysis:queue-jumping]. Since the ERP system only stores the amount of goods in a store, the amount
 of available goods and the list of shipment orders, there is no clear relation between the reserved item and the shipment order. Sometimes, the shipment orders cannot be processed in the order of their 
@@ -78,8 +78,7 @@ Therefore we can introduce a variable $OnTheWay$ with following definition:
 
 $$ OnTheWay_{g,s} = \sum_{wr \in utWR_s}{\left( \mathbox{\# of items of $g$ on $wr$}  \right)},$$
 
-\noindent where the $g$ and $s$ have the same meaning as above and $utWR_s$ is a set of unrealised warehouse receipts with corresponding realised picking lists (unrealised transfer warehouse receipts) in store
-$s$. The corresponding picking lists are from different stores than the warehouse receipts.
+\noindent where the $g$ and $s$ have the same meaning as above and $utWR_s$ is a set of unrealised warehouse receipts in a store $s$ with corresponding realised picking lists in some of the other stores.
 
 It is useful to count with the planned transfer shipment orders. The amount of the goods in such orders is added to the $OnTheWay$ variable. Therefore, we define a $OnTheWay^{*}$ as follows:
 
@@ -130,16 +129,17 @@ Stores cannot be always open and operational, since they are tended to by human 
 There are several recurring outages -- weekends and state holidays. Sometimes there is an outage caused by an absence of the operator (leave or illness) and sometimes there is another reason for the
 outage such as a stock take\pozn{stock take = inventura}. Generally, there are two types of outages -- 1) closed store, 2) overloaded store. 
 
-In the first case, the store cannot receive nor send any goods to another branch. Therefore, it does not make sense to send there any items or plan transfers from that store. A planned outage we can 
-take into an account, but with an unplanned outage we have to perform a certain action, for example cancel the planned transfers and plan the transfer from another store.
+In the first case, the store cannot receive nor send any goods to another branch. Therefore, it does not make sense to send there any items or plan transfers from that store. We can 
+take into an account a planned outage, but with an unplanned outage we have to perform a certain action, for example cancel the planned transfers and plan the transfer from another store.
 
 In the latter case, the store can receive and send goods marked for high-priority transfers (i.e. the transfers dealing with the negative $Availability$ on a store), but will most probably not process the
 low-priority transfers.
 
 \sec Automated logistics problem formulation
 
-Based on the description if the previous sections, we now formulate an {\em Automated logistics problem} (ALP\glos{ALP}{Automated logistics problem}), which is to be solved in this thesis. Given a
-5-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock)$, where:
+Based on the description if the previous sections, we now formulate an on-line {\em Automated logistics problem} (ALP\glos{ALP}{Automated logistics problem}), which is to be solved in this thesis. 
+Given a 5-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock)$, where:
+
 \begitems
 * ${\bf S}$ is a set of stores.
 * ${\bf G}$ is a set of goods.
@@ -159,25 +159,37 @@ $$\min\quad \sum_{p \in {\bf Sch}}{{\rm duration}(p)}\eqmark$$
 \noindent The schedule ${\bf Sch}$ must be compatible with the following constraints:
 
 \begitems \style N
+* The sum of planned transfers cannot exceed the amount of goods in the store.
+
+\label[eq:analysis:alp-c1]
+$$\forall g \in {\bf G}, \forall s \in {\bf S}\colon \sum_{p \in {\bf Sch}\atop{{\rm goods}(p) = g \atop {\rm origin}(p) = s}}{{\rm amount}(p)} \leq OnStock(g,s) \eqmark$$
+
+* The sum of planned transfers cannot exceed the demanded amount for the particular demand.
+
+\label[eq:analysis:alp-c2]
+$$\forall d \in {\bf D}\colon \sum_{p \in {\bf Sch}\atop {\rm demand}(p) = d}{{\rm amount}(p) \leq {\rm amount}(d)}\eqmark$$
+
+\break
 * All demands must be processed in their order.
+\label[eq:analysis:alp-c3]
 $$ \forall p \in {\bf Sch}\colon {\rm demand}(p) = d \Rightarrow \hskip\displaywidth minus 1fill$$
-$$\hskip\displaywidth minus 1fill\Rightarrow\forall d' <_{\bf D} d \wedge {\rm store}(d) = {\rm store}(d')\colon {\rm amount}(d') =\hskip-2em \sum_{\scriptstyle p' \in {\bf Sch}\atop \scriptstyle 
+$$\hskip\displaywidth minus 1fill\Rightarrow\forall d' \prec d \wedge {\rm store}(d) = {\rm store}(d')\colon {\rm amount}(d') =\hskip-2em \sum_{\scriptstyle p' \in {\bf Sch}\atop \scriptstyle 
 {\rm demand}(p') = d'}{\hskip-2em {\rm amount}(p)} \eqmark$$
 
 * All possible transfers must be scheduled.
 
-$$\forall g \in {\bf G}\colon \sum_{p \in {\bf Sch}\atop{\rm goods}(p) = g}{{\rm amount}(p)} = \min\left\{\sum_{s \in {\bf S}}{OnStock(g,s)}; \sum_{d\in{\bf D}\atop {\rm goods}(d) = g}{{\rm amount}(d)} \right\}\eqmark $$
+\label[eq:analysis:alp-c4]
+$$\forall g \in {\bf G}\colon \sum_{\scriptstyle p \in {\bf Sch}\atop\scriptstyle {\rm goods}(p) = g}{{\rm amount}(p)} = \min\left\{\sum_{s \in {\bf S}}{OnStock(g,s)}; 
+\sum_{\scriptstyle d\in{\bf D}\atop\scriptstyle {\rm goods}(d) = g}{{\rm amount}(d)} \right\}\eqmark $$
 
-* The sum of planned transfers cannot exceed the amount of goods in the store.
-
-$$\forall g \in {\bf G}, \forall s \in {\bf S}\colon \sum_{p \in {\bf Sch}\atop{{\rm goods}(p) = g \atop {\rm origin}(p) = s}}{{\rm amount}(p)} \leq OnStock(g,s) \eqmark$$
 
 \enditems
 
 \secc ALP with low-priority demands
 
 As discussed in section \ref[secc:analysis:low-priority], we can place low-priority demands. These demands can be ignored, if the store would become overloaded. To model this situation, we
-introduce an {\em Automated logistics problem with low-priority demands} (ALP-lp\glos{ALP-lp}{Automated logistics problem with low-priority demands}) as a variation to ALP.
+introduce an {\em Automated logistics problem with low-priority demands} (ALP-lp\glos{ALP-lp}{Automated logistics problem with low-priority demands}) as a variation to ALP. We describe only differences
+to the original problem.
 
 ALP-lp is a 6-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock, Capacity, Priority)$, where
 
@@ -187,7 +199,46 @@ ALP-lp is a 6-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock, Capacity, P
 * $Priority \colon {\bf D} \to \{high, low\}$ is a function which returns a priority of a given demand.
 \enditems
 
-[multikriterialni, zmeni se podminky....]
+The objective function differs as we need to fulfil two goals, which are in contradiction. The task is to find the shortest schedule, just like in the case of ALP. However, the simple way how to achieve
+that state is to ignore all low-priority demands. Therefore ALP-lp is a multiple-criteria optimization problem.
 
+$$\min\quad \sum_{p \in {\bf Sch}}{{\rm duration}(p)}\eqmark$$
+$$\max\quad \sum_{p \in {\bf Sch}}{{\rm amount}(p)}\eqmark$$
+
+The generated schedule ${\bf Sch}$ must be compatible with the following constraints:
+
+\begitems \style N
+* The constraints \ref[eq:analysis:alp-c1] and \ref[eq:analysis:alp-c2] must be satisfied.
+* The order of high-priority orders must be maintained.
+
+$$ \forall p \in {\bf Sch}\colon {\rm demand}(p) = d \Rightarrow \forall d' \prec d \wedge {\rm store}(d) = {\rm store}(d') \wedge Priority(d') = high\colon\hskip\displaywidth minus 1fill$$
+$$\hskip\displaywidth minus 1fill {\rm amount}(d') =\hskip-2em \sum_{\scriptstyle p \in {\bf Sch}\atop \scriptstyle 
+{\rm demand}(p) = d'}{\hskip-2em {\rm amount}(p)} \eqmark$$
+
+* The capacity of a store cannot be exceeded if possible. Each store cannot process more items of goods per day than its capacity. Otherwise, the store cannot process low-priority demands. We use a 
+function $at(p, s)$ which returns an id of a day, when the plan $p$ is processed in a store $s$.
+
+$$ \forall s \in {\bf S}, \forall t \in \{at(p, s) | \forall p \in {\bf Sch}, \forall s \in {\bf S} \}: \hskip\displaywidth minus 1fill $$
+$$\hskip\displaywidth minus 1fill\sum_{\scriptstyle p \in {\bf Sch}\atop \scriptstyle at(p, s) = t}{Amount(d)} \geq Capacity(s) \Rightarrow \sum_{\scriptstyle p \in {\bf Sch}\atop 
+{\scriptstyle at(p, s) = t \atop \scriptstyle priority(demand(p)) = low}}{Amount(d)} = 0 \eqmark $$
+
+\enditems
+
+\secc ALP-lp with penalties
+
+The ALP-lp can be reformulated to avoid optimization of two contradicting criteria. The {\em Automated logistics problem with low-priority demands and penalties} (ALP-lp2\glos{ALP-lp2}{Automated 
+logistics problem with low-priority demands and penalties}) differs from ALP-lp in the objective function. We add a penalty cost for each low-priority demand, which is ignored. The ALP-lp2
+is then a 7-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock, Capacity, Priority, Penalty)$, where
+
+\begitems
+* ${\bf G}$, ${\bf S}$, ${\bf Del}$, ${\bf Del}$, ${\bf D}$, $OnStock$, $Capacity$ and $Priority$ have the same meaning as in ALP-lp.
+* $Penalty \colon {\bf D} \to {\bbchar N}$ is a function which returns a penalty if a given low-priority demand is not resolved.
+\enditems
+
+The constraints are the same as in ALP-lp
+The objective function is stated as follows:
+
+$$\min\quad \left\{ \sum_{p \in {\bf Sch}}{{\rm duration}(p)} + \hskip-2.5em\sum_{\scriptstyle d \in {\bf D} \atop {\scriptstyle {\rm Priority}(d) = low \atop \scriptstyle \not\exists p\in {\bf Sch}: 
+{\rm Demand}(p) = d}}{\hskip-2.5em {\rm Penalty}(d)} \right\}\eqmark$$
 
 

@@ -4,7 +4,7 @@
 
 \chap Related research
 
-\pozn{zkontrolováno 15.7.}In this chapter, we will review useful models and techniques which will help us formulate a model for the problem described in chapter \ref[chap:analysis].
+\pozn{Zkontrolovano: ne}In this chapter, we will review useful models and techniques which will help us formulate a model for the problem described in chapter \ref[chap:analysis].
 
 \sec Transportation problems
 
@@ -34,7 +34,7 @@ when there is a need to plan routes of vehicles with a limited capacity from a c
 In \cite[Braysy2005], there is defined a Vehicle routing problem with time windows (VRPTW\glos{VRPTW}{Vehicle routing problem with time windows}). The key difference to cVRP is that the depots
 can be serviced within a specified time interval or time window. This variation of VRP is widely used and well researched and there are available many heuristics to solve it. 
 
-Another variation of VRP is a Stochastic vehicle routing problem (SVRP\glos{SVRP}{Stochastic vehicle routing problem}) As presented in \cite[Gendreau1996], stochastic vehicle routing problems 
+Another variation of VRP is a Stochastic vehicle routing problem (SVRP\glos{SVRP}{Stochastic vehicle routing problem}). As presented in \cite[Gendreau1996], stochastic vehicle routing problems 
 arise whenever some elements of the problem are random, for example stochastic demands or stochastic travel times. The paper describes an approach using stochastic programming. Such a stochastic 
 program is modelled in two stages -- the first is ``a priori'' solution and the second is a ``corrective action''.
 A stochastic program is usually modelled either as a {\em chance constrained program} (CCP\glos{CCP}{Chance constrained program}), where the solution is searched with respect to a particular threshold for a probability of a failure, or
@@ -104,16 +104,6 @@ previously mentioned problems is the Vehicle Routing Problem with Stochastic Cus
 %% 
 %% \secc Stochastic vehicle routing (SVRP)
 
-\glos{SVRP}{Stochastic vehicle routing problem}As presented in \cite[Gendreau1996], stochastic vehicle routing problems arise whenever some elements of the problem are random, for example stochastic demands or stochastic travel times.
-The paper describes an approach using stochastic programming. Such a stochastic program is modelled in two stages -- the first is ``a priori'' solution and the second is a ``corrective action''.
-A stochastic program is usually modelled either as a {\em chance constrained program} (CCP\glos{CCP}{Chance constrained program}), where the solution is searched with respect to a particular threshold for a probability of a failure, or
-as a {\em stochastic program with recourse} (SPR\glos{SPR}{Stochastic program with recourse}) minimising the expected cost of the second stage solution plus the expected net cost of recourse.
-The SVRPs are usually modelled as mixed or pure integer stochastic programs or as Markov decision processes.
-
-The most studied problem in this class is the {\em Vehicle Routing Problem with Stochastic Demands} (VRPSD\glos{VRPSD}{Vehicle Routing Problem with Stochastic Demands}). In this problem, customer demands are independent random variables.
-The next is the {\em Vehicle Routing Problem with Stochastic Customers} (VRPSC\glos{VRPSC}{Vehicle Routing Problem with Stochastic Customers}) with customers which are present with some probability but have deterministic demands. A combination of both
-previously mentioned problems is the Vehicle Routing Problem with Stochastic Customers and Demands (VRPSCD\glos{VRPSCD}{Vehicle Routing Problem with Stochastic Customers and Demands}). This problem is extremely hard to solve.
-
 % \secc A classification scheme for vehicle routing and scheduling problems
 % 
 % As proposed in \cite[Desrochers1990], one can construct a classification scheme which can be used to select an appropriate model to solve a real-life problem. The scheme can be used only
@@ -135,7 +125,7 @@ previously mentioned problems is the Vehicle Routing Problem with Stochastic Cus
 
 \secc Scheduling
 
-In \cite[Beck2002] the VRP is reformulated as a scheduling problem. However, these reformulations do not have the same performance. As described in \cite[Beck2003], in an optimisation task,
+In \cite[Beck2002] the VRP is reformulated as a scheduling problem. However, these reformulations do not have the same performance. As described in the paper, in an optimisation task,
 the VRP is better in minimising the total travelled distance whereas the scheduling technology is better in finding the quickest solution. In the existence task was the VRP itself
 significantly worse than the scheduling technology. Though, the VRP technology can be used to improve results of the scheduling technology.
 
@@ -150,213 +140,49 @@ the Dantzing-Wolfe or Lagrangean relaxation embedded in a branch-and-bound searc
 
 \secc Solution strategies
 
-\secc Tabu search
+There exists several solution strategies to solve transportation problems. The first group of them are based on local search of state space. The strategy searches through the space of candidate solutions
+and move from one solution to another until it finds an optimal solution. As an example, we mention Tabu search, described in \cite[Glover1989,Glover1990a,Glover1990]. This method maintains a list
+of forbidden candidate solution (e.g. previously visited solutions or solutions violating a certain rule) to enhance the performance of a search.
 
-A Tabu search, as presented in \cite[Glover1989,Glover1990a,Glover1990] 
-is a solution strategy for solving combinatorial optimization problems. It can be used to solve 
-a wide range of problems from graph theory and matroid settings to general pure and mixed integer programming problems. The combinatorial optimization problem is formulated as follows: 
+In \cite[Altinkemer1991], the VRP is transformed to weighted matching problem, which is afterwards solved using the Parallel savings based heuristics algorithm (PSA\glos{PSA}{Parallel savings 
+based heuristics algorithm}). They present three variants of PSA, but only one of them is a polynomial algorithm with a time complexity $O(n^3)$.
 
-$${\fam0 Minimize:}\quad c(x): x \in {\bf X}\quad {\fam0 in}\, {\bbchar R}_n,$$
-
-where the function $c(x)$ is a function (linear or non-linear) and the condition $x\in X$ is assumed to constrain the specified components of $x$ to discrete values. The Tabu search itself 
-can be defined as follows:
-
-\begitems \style N
-* Select an initial $x\in {\bf X}$ and let $x^\hv := x$. Set the iteration counter $k = 0$ and begin with ${\bf T}$ empty.
-* If $S(x)\setminus {\bf T}$ is empty, go to Step 4. Otherwise, set $k := k+1$ and select $s_k \in S(x) \setminus T$ such that $s_k(x) = {\rm OPTIMUM}(s(x) : s \in S(x) \setminus T)$.
-* Let $x := s_k(x)$. If $c(x) < c(x^\hv)$, where $x^\hv$ denotes the best solution currently found, let $x^\hv := x$.
-* If a chosen number of iterations has elapsed either in total or since $x^\hv$ was last improved, or if $S(x) \setminus {\bf T} = \emptyset$ upon reaching this step directly from Step 2, stop.
-Otherwise update ${\bf T}$ (as subsequently identified) and return to Step~2.
-\enditems
-
-\secc Parallel savings based heuristics
-
-In \cite[Altinkemer1991], there is presented an approach based on weighted matching problem. The paper defines three versions of the algorithm -- a PSA1\glos{PSA1--3}{Parallel savings based heuristics algorithms}, which is not polynomial, a PSA2, which is fully
-polynomial with a time complexity of $O(n^3)$. Finally, a PSA3 algorithm is an improvement of PSA2, which is not polynomial as well.
-
-First we will introduce the notation used in the description of the algorithm:
-
-
-\begitems
-* $n$ is the number of nodes in the problem,
-* ${\bf V}$ is the node set of the graph, $V = \{1, \dots, n\}$,
-* $Q$ is the vehicle capacity,
-* $d_i$ is the load to be delivered to node $i$ ($d_1 = 0$),
-* ${\bf R}_p$ is the set of nodes in cluster $p$; this is the set of nodes assigned to vehicle $p$,
-* $C({\bf R}_p)$ is the cost of the optimum travelling salesman tour over ${\bf R}_p$ and node ${\bf 1}$ (the depot),
-* $S_{pq}$ is the savings obtained by merging clusters $p$ and $q$,
-* ${\bf M}_i$ is a set of dummy nodes added to the network at iteration $i$; $|{\bf M}_i| = n - (i+1)T$ and $2 \leq T \leq 12$,
-* $p_f$ is the first endpoint of the tour in cluster $p$,
-* $p_l$ is the last endpoint of the tour in cluster $p$,
-\enditems
-
-The PSA1 algorithm is defined as follows:
-
-\begitems \style N
-* {\em (Initialization)} For $p = 1, \dots, n$, set ${\bf R}_p = \{p\}$, $i = 1$, ${\bf V}_0 = {\bf V}$, and choose a value for $T$.
-* Form the dummy node set ${\bf M}_i$, such that $|{\bf M}_i| = n - (i+1)T$. For every $p$ and $q$, $p<q$ do
-
-$$S_{pq} = \cases{0 & $p<q$ and $p,q \in {\bf M}_i$\cr -\infty & $p<q$ and $p\in {\bf V}_{i-1}$ and $q\in {\bf M}_i$}$$
-
-\noindent For every $p$ and $q$, $p<q$ and $p, q \in {\bf V}_{i-1}$ do:
-
-\begitems \style a
-* If $\sum_{j\in {\bf R}_p \cup {\bf R}_q}{d_j} > Q$ go to the next combination of $p$ and $q$.
-* Otherwise, compute $S_{pq}$ according to the formula
-
-$S_{pq} = \cases{0 & if $p=1$, $q=1, \dots, |{\bf V}_{i-1}|$\cr C({\bf R}_p) + C({\bf R}_q) - C({\bf R}_p \cup {\bf R}_q) & otherwise}$
-\enditems
-
-* Solve the maximum weighted matching problem with ${\bf V}_{i-1}\cup {\bf M}_i$ as its node set, and $S_{pq}$ as the cost entry for arc $(p,q)$. Merge clusters $p$ and $q$ if arc $(p,q)$ is in the matching cluster
-and $p,q \in {\bf V}_{i-1}$ unless either $p$ or $q$ is node ${\bf 1}$.
-* If all mergers are non-admissible STOP, otherwise increase $i$ by one, update ${\bf V}_i$ to include all clusters and go to {\em Step 2}.
-\enditems
-
-Since the computation of $S_{pq}$ in {\em Step 2} involves solving of the optimum travelling salesman tour, it is not a polynomial algorithm. Therefore, a different formula is used for PSA2 and PSA3:
-
-$$S_{pq} = \max\cases{
-	c_{1p_f} + c_{1q_f} - c_{p_f q_f} \cr 
-	c_{1p_f} + c_{1q_l} - c_{p_l q_l} \cr
-	c_{1p_l} + c_{1q_l} - c_{p_l q_l} \cr
-	c_{1p_l} + c_{1q_f} - c_{p_l q_f}
-}$$
-
-In PSA3, after the final clusters are formed using PSA2, a TSP is solved for each final cluster formed. The tour generated by the optimal travelling salesman tour of that cluster is selected as 
-the solution for that cluster.
-
-\secc Monte Carlo Tree Search
-
-Monte Carlo Tree Search is a stochastic optimization algorithm combining classical tree search with random sampling of the search space. In \cite[Trunda2013] the MCTS\glos{MCTS}{Monte Carlo Tree Search} is used to solve
-planning problems in transportation domains.
-
-The MCTS algorithm builds an asymmetric tree to represent the search space by repeatedly performing four steps, which are illustrated on the figure \ref[fig:strategies:mcts]
+Another approach is presented in \cite[Trunda2013], where the transportation tasks are solved using a stochastic technique. The paper presents a Monte Carlo Tree Search (MCTS\glos{MCTS}{Monte Carlo Tree Search}), a stochastic optimization algorithm combining classical tree search with random sampling of the search space. The MCTS algorithm builds an asymmetric tree to represent the search space by repeatedly performing four steps, which are illustrated on the figure \ref[fig:strategies:mcts]
 
 \begitems \style N
 * {\em Selection} -- the tree is traversed from the root to a leaf using some criterion called {\em tree policy} to select the most urgent leaf.
 * {\em Expansion} -- all applicable actions for the selected leaf node are applied and the resulting states are added to the tree as successors of the selected node.
 * {\em Simulation} -- a pseudo-random simulation is run from the selected node until some final state is reached. During the simulation the simulation the actions are selected by a {\em
 simulation policy}.
-* {\em Update/Back-propagation} -- the result of the simulation is propagated back in the tree from the selected node to the root and statistics of the nodes on this path are updated 
+* {\em Update/Back-propagation} -- the result of the simulation is propagated back in the tree from the selected node to the root and statistics of the nodes on this path are updated
 according to the result.
 \enditems
 
 \begfigure
 \centerline{\inspic figs/strategies-mcts-1.pdf }\nobreak\medskip
 \label[fig:strategies:mcts]\caption/f Basic schema of MCTS from \cite[Chaslot2006]
-\endfigure
+\endfigure 
 
-The MCTS was originally formulated in \cite[Chaslot2006] for the purposes of a game AI. However, as presented in \cite[Trunda2013], it is suitable for solving of planning problems.
-In such a case the planning task is transformed to the problem of finding a shortest path in an implicitly given state space, where transitions/moves between the states are
-defined by the actions. Though, classical path-finding techniques cannot be applied there because the state space is enormous.
-
-The paper identifies a problem with the infiniteness of paths in the state space. Since most of the actions are reversible, there are cycles and even finite state space does not assure
-that paths will be finite. There are specified three possible threats -- cycles in the state space, dead ends and dead components -- with possible ways to solve them.
-
-
-\secc Branch and bound approach to solve VRP
-
-``Branch and bound'' is a general algorithm for finding optimal solutions of optimization problems first described in \cite[Land1960] in 1960. The algorithm uses two tools, a splitting procedure and a bounds
-procedure. The algorithm systematically enumerates possible solutions and use the upper and lower bounds to discard solutions which are not feasible. Therefore, there is no need to explore whole state
-space to find a feasible solution.
+For a non-stochastic tree search, we can use a ``branch and bound'' algorithm. It is a general algorithm for finding optimal solutions of optimization problems first described in 
+\cite[Land1960] in 1960. The algorithm uses two tools, a splitting procedure and a bounds procedure. The algorithm systematically enumerates possible solutions and use the upper and lower 
+bounds to discard solutions which are not feasible. Therefore, there is no need to explore whole state space to find a feasible solution. As presented in \cite[Toth2002], there exists
+several bounds procedures. The paper presents a difference between symmetric cVRP (scVRP\glos{scVRP}{Symmetric cVRP}) and asymmetric cVRP (acVRP\glos{acVRP}{Asymmetric cVRP}) and propose different
+bounds procedures for each of them. 
 
 In a survey paper \cite[Toth2002], there are presented several bounds procedures for cVRP problems. The paper presents a difference between symmetric cVRP (scVRP\glos{scVRP}{Symmetric cVRP}) and asymmetric cVRP (acVRP\glos{acVRP}{Asymmetric cVRP}) and propose different
 bounds procedures for each of them. The cVRP is asymmetric if it has an asymmetric cost matrix. Otherwise, the cVRP is symmetric. The benchmarks showed, that the best bounds procedure for an acVRP is 
 based on the additive approach which considers, in sequence, different infeasible arc subsets so as to produce a possibly better overall lower bound. Likewise, for the scVRP the benchmarks shows
 that the best bounds procedure is based on $b$-matching, which is a counterpart for the symmetric version of the assignment relaxation for acVRP -- a bounds procedure based on transforming of the cVRP
-to the assignment problem.
+to the assignment problem. 
 
+By adding a cutting planes, we get a ``branch and cut algorithm'', described in detail in \cite[Padberg1991]. The branch-and-cut approach was applied to the VRP in \cite[Bard1998]. In the concrete, they used this approach to solve the Vehicle routing problem with satellite facilities (VRPSF\glos{VRPSF}{Vehicle routing problem with satellite facilities}).  
 
-\sec Branch and cut algorithm
-
-A slightly different approach than branch and bound is the ``branch and cut algorithm'', described in detail in \cite[Padberg1991]. First, the problem is formulated as a linear programming 
-problem. Then, a solution is found. If the solution is not integer, the algorithm either splits one variable or adds a cutting plane. 
-
-We will demonstrate this technique on an example from \cite[Mitchell2002]:
-
-Let have an integer programming problem
-
-\label[strategies:branch-and-cut:eq0]
-$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
-\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\cr
- & -x_1 & + & 2x_2 & \leq & 5\cr
- & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
-
-First the algorithm solves the linear programming relaxation, giving the point $(2{3 \over 7}, 3{5 \over 7})$, with value $-33{1 \over 7}$. The algorithm has now a choice -- it can divide the problem to
-two problems by splitting on a variable or add a cutting plane, for example $x_1 + x_2 \leq 5$.
-
-\begfigure
-\centerline{\inspic figs/strategies-branch-and-cut-1.pdf }\nobreak\medskip
-\label[fig:strategies:branch-and-cut]\caption/f Branch-and-cut example from \cite[Mitchell2002]. The dots represents possible integer solutions, the dashed line is the convex hull of the integer points. The grayed area is a polyhedron used for linear programming if we ignore the integrality restrictions.
-\endfigure
-
-If the algorithm splits on $x_1$, two new problems are obtained:
-
-\label[strategies:branch-and-cut:eq1]
-$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
-\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill\cr
- & -x_1 & + & 2x_2 & \leq & 5\hfill\cr
- & {\bf x_1} & & & \geq & {\bf 3}\hfill\cr 
- & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
-
-\noindent and
-
-\label[strategies:branch-and-cut:eq2]
-$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
-\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill\cr
- & -x_1 & + & 2x_2 & \leq & 5\hfill\cr
- & {\bf x_1} & & & \leq & {\bf 2}\hfill\cr 
- & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
-
-The optimal solution to the original problem will be the better of the solutions to these two subproblems. The solution to the linear programming relaxation of \ref[strategies:branch-and-cut:eq1] is 
-$(3,2)$, with value $-28$. This solution is integral, so it solves \ref[strategies:branch-and-cut:eq1], and becomes the incumbent best known feasible solution. The LP relaxation of 
-\ref[strategies:branch-and-cut:eq2] has optimal solution $(2,3.5)$, with value $-29.5$. This point is non-integral, so it does not solve \ref[strategies:branch-and-cut:eq2], and it must be attacked 
-further.
-
-Assume the algorithm uses a cutting plane approach and adds the inequality  $2x_1+x_2\leq 7$ to \ref[strategies:branch-and-cut:eq2]. This is a valid inequality, in that it is satisfied by every 
-integral point that is feasible in \ref[strategies:branch-and-cut:eq2]. Further, this inequality is violated by $(2,3.5)$, so it is a cutting plane. The resulting subproblem is 
-
-\label[strategies:branch-and-cut:eq3]
-$$\matrix{\min{z} := & -6x_1 & - & 5x_2 \cr
-\mathbox{subject to } & 3x_1 & + &  x_2 & \leq & 11\hfill \cr
- & -x_1 & + & 2x_2 & \leq & 5\hfill \cr
- & x_1 & & & \leq & 2\hfill \cr 
- & {\bf 2x_1} & {\bf +} & {\bf x_2} & \leq & {\bf 7}\hfill \cr 
- & & &  x_1,x_2 & \geq & 0,\mathbox{ integer}} \eqmark$$
-
-The LP relaxation of \ref[strategies:branch-and-cut:eq3] has optimal solution $(1.8,3.4)$, with value $-27.8$. Notice that the optimal value for this modified relaxation is larger than the value 
-of the incumbent solution. The value of the optimal integral solution to the second subproblem must be at least as large as the value of the relaxation. Therefore, the incumbent solution $(3,2)$ is 
-better than any feasible integral solution for \ref[strategies:branch-and-cut:eq3], so it actually solves the original problem.
-
-\begfigure
-\centerline{\inspic figs/strategies-branch-and-cut-2.pdf }\nobreak\medskip
-\label[fig:strategies:branch-and-cut:2]\caption/f Progress of branch-and-cut on the two dimensional integer programming problem from \cite[Mitchell2002].
-\endfigure
-
-\begfigure
-\centerline{\inspic figs/strategies-branch-and-cut-3.pdf }\nobreak\medskip
-\label[fig:strategies:branch-and-cut:3]\caption/f Three steps of the algorithm branch-and-cut.
-\endfigure
-
-The branch-and-cut approach was applied to the VRP in \cite[Bard1998]. In the concrete, they used this approach to solve yhe Vehicle routing problem with satellite facilities (VRPSF).  
-Their approach constists of the following steps:
-
-\begitems \style N
-* {\em (Preprocessing)} Set up directed graph and sparsify.
-* {\em (Upper bound)} Obtain an upper bound on the MILP objective function by running a heuristic to find a feasible solution.
-* {\em (Lower bound)} Solve the LP relaxation of the VRPSF.
-* {\em (Optimality check)} If the optimality conditions are satisfied go to Step 8; otherwise go to Step 4.
-* {\em (Variable fixing)} Determine if any binary variables can be fixed at zero or one.
-* {\em (Cut generation)} Solve the separation problem to generate valid inequalities. If no such inequalities can be identified go to Step 7; otherwise go to Step 2.
-* {\em (Branching)} Create a new node in the search tree following the logic of branch and bound. If branching is not possible, go to Step 8; otherwise go to Step 2.
-* {\em (Desparsification)} If no sparsified variables remain fixed at zero, stop and declare the incumbent the optimal solution to the MILP. Otherwise, introduce a subset of the sparsfied variables whose
-reduced costs are negative back into model and go to Step 2.
-\enditems
 
 \secc Transportation problem and ALP
 
 The transportation problems do not fit well with ALP. The key feature of a transportation problem is a fleet of vehicles with a limited capacity. However, in ALP there is no such condition. 
 In ALP-lp, stores have a limited capacity. However, the stores corresponds to locations in vehicle routing problems. On the other hand, in ALP and ALP-lp, there is no capacity constraint 
-to the delivery routes. They are provided by outsources delivery companies and are in a practical case unlimited.
+to the delivery routes. They are provided by outsourced delivery companies and are in a practical case unlimited.
 
 % \sec Commodity flow problems
 % 
@@ -381,15 +207,151 @@ sum $\sum_{i=1}^k{|f_i(vw)|}$ of the single commodity flows on that edge.
 for two commodities. The dotted line represents a flow for a commodity 1 and a dashed line represents a flow for a commodity 2.
 \endfigure
 
+However, as in case of transportation problem, this approach is not suitable for ALP because it solves a problem of limited capacity of connections between nodes with an unlimited capacity. On the
+other hand, the ALP has unlimited connections. Moreover, in ALP-lp nodes have a limited capacity.
+
+Still, the network flows can be used to model the ALP (but not the ALP-lp). We use a Ford-Fulkerson algorithm from \cite[Ford1956] as a basis for an algorithm described in section 
+\ref[secc:analysis:ford-fulkerson]. The Ford-Fulkerson algorithm is shown as Algorithm \ref[alg:models:ford-fulkreson]
+
+\bigskip
+
+% \begfigure
+\begalgo
+\+{\bf function} \uppercase{ford--fulkerson}($G$) {\bf returns} the maximal flow\cr
+\+\cr
+\+\quad\cleartabs&{\bf variables:} \cleartabs&$G$\algfill&$G=(V,E)$ a network with flow capacity $c$,\cr 
+\+               &                           &           &a source node $s$ and a sink node $t$\cr
+\+               &                           &$f$\dotfill&a network flow\cr
+\+               &                           &$c$\dotfill&a capacity of an edge or path\cr
+\+               &                           &$p$\dotfill&a path in a graph\cr
+\+               &                           &$(u,v)$\dotfill&an edge in $G$\cr
+\+\cr
+\+               &$f(u,v) \leftarrow 0$ for all edges $(u,v) \in G$\cr
+\+               &{\bf while} $\exists p$ from $s$ to $t$ in $G$, such that $\forall (u,v) \in p\colon c(u,v) > 0$ {\bf do:}\cr
+\+               &\quad\cleartabs&find $c(p) = \min\{c(u,v) : (u,v) \in p\}$\cr
+\+               &               &{\bf for each} $(uv) \in p$ {\bf do:}\cr
+\+               &               &\quad\cleartabs&$f(u,v) \leftarrow f(u,v) + c(p)$\cr
+\+               &               &{\bf end for}\cr
+\+               &{\bf end for}\cr
+\+               &{\bf return} $f$\cr
+\endalgo\nobreak\medskip
+\label[alg:models:ford-fulkreson]\caption/a A pseudo-code of a Ford-Fulkerson algorithm.
+% \endfigure
+
+\bigskip
+
 \label[sec:models:networks]
 \sec Constraint programming
 
+Constraint programming is a programming paradigm which uses constraints to describe a solution rather than to program a way of achieving such a solution. Out of many applications, the constraint 
+programming can be used to model network problems. We discuss it in section \ref[secc:models:cp-networks]. A further description of constraint programming is contained in \cite[Dechter2003].
+
+\secc Constraint satisfaction problem
+
+The {\em Constraint satisfaction problem} (CSP\glos{CSP}{Constraint satisfaction problem}) consist of:
+
+\begitems
+* A set of variables ${\bf X} = \{x_1, \dots, x_n\}$
+* For each variable $x_i$ a finite set $D_i$ of possible values (its {\em domain}),
+* A set of {\em constraints} restricting the values that the variables can simultaneously take.
+\enditems
+
+A {\em solution} to a CSP is an assignment of value from its domain to every variable, in such a way that every constraint is satisfied. We may want to find:
+
+\begitems
+* just one solution, with no preference as to which one,
+* all solutions,
+* an optimal, or at least a good solution, given some objective function defined in terms of some or all of the variables.
+\enditems
+
+We can model all of the constraint problems using only of the binary constraints (the constraints with two variables). The CSP can be represented as a constraint multigraph where the variables in the 
+model are the nodes of the graph and the constraints over the variables in the model are the edges connecting the appropriate nodes. The edge $e(x,y)$ is {\em consistent} if for each values of $x$
+there exists a value $y$ such that the constraint is satisfied.
+
+The CSP is {\em arc consistent} if all of the edges in the constraint graph are consistent in the both directions. The problem which cannot be transformed to arc consistent state does not have a solution.
+However, the arc consistency does not ensure that the problem has a solution. For example let have variables $X$, $Y$ and $Z$, all with a domain $\{0,1\}$ with constraints $X \neq Y$, $Y \neq Z$, 
+$Z\neq X$. The problem is arc consistent, but is not feasible. However, the arc consistency is an important feature of a problem, since it helps to reduce the search space.
+
+There are lots of algorithms to solve CSP. The most common of them, {\em maintained arc consistency} (MAC\glos{MAC}{Maintained arc consistency algorithm}) presented in Algorithm \ref[alg:models:csp-mac].
+This algorithm is currently most used technique \cite[Bartak2007], since it combines search and maintaining of the consistency of solution.
+
+\begfigure
+\begalgo
+\+{\bf function} \uppercase{mac--labelling}($V$, $D$, $C$) {\bf returns} labelling or false \cr
+\+\cr
+\+\quad\cleartabs&{\bf variables:} \cleartabs&$V$\algfill&a set of variables,\cr 
+\+               &                           &$D$\dotfill&a set of domains for variables from $V$\cr
+\+               &                           &$C$\dotfill&a set of constraints\cr
+\+               &                           &$x$\dotfill&a constrained variable\cr
+\+               &                           &$v$\dotfill&a possible value of a constrained variable\cr
+\+               &                           &$R$\dotfill&a return value, either a set of assigned values or false\cr
+\+\cr
+\+&{\bf if} all variables from $V$ are assigned {\bf then} return $V$ {\bf end if}\cr
+\+&select not-yet assigned variable $x$ from $V$\cr
+\+&{\bf for each} value $v$ from $D_x$ {\bf do:}\cr
+\+&\quad\cleartabs&$(TestOK,D')\leftarrow consistent(V, D, C \cup \{x=v\})$\cr
+\+&&{\bf if} $TestOK=true$ {\bf then}\cr
+\+&&\quad\cleartabs&$R\leftarrow \mathbox{\uppercase{mac--labelling}}(V, D', C)$\cr
+\+&&&{\bf if} $R\neq fail$ {\bf then} return $R$ {\bf end if}\cr
+\+&&{\bf end if}\cr
+\+&{\bf end for}\cr
+\+&{\bf return} fail\cr
+\endalgo\nobreak\medskip
+\label[alg:models:csp-mac]\caption/a MAC algorithm from \cite[Bartak2007].
+\endfigure
+
+The algorithm consists of two phases repeated until the solution is found or until it is proved to not exist. The first phase is filtering of the variable domain by eliminating as many as possible 
+values of the domain. The filtering can be achieved by transforming the problem into arc consistent problem. The filtration phase can end in three ways:
+
+\begitems \style N
+* The domain of come variable is empty. Therefore, the problem has no solution.
+* The domains of all variables have just one element. The algorithm found the solution.
+* The domains of some variables have more than one element while the problem is arc consistent.
+\enditems
+
+For the problem $P$ which is arc consistent but do not have a solution we perform the distribution phase. In this phase we introduce a new constraint $c$ and create two new problems, $P \cup \{c\}$ and 
+$P \cup \{\neg c\}$. If the problem $P$ has a solution, then at least one of the new problems has a solution. Afterwards, the filtering phase is run again. The typically used constraint $c$ is of
+a form $x = v$ or $x < v$. However, any constraint can be used. The  {\em fist-fail} strategy is used to select a proper variable for the new constraint $c$. It picks a variable with a smallest domain.
+Thus, it will be faster to find out, whether the problem is feasible or not.
+
+The ALP is an optimization problem. We will now discuss techniques used to find an optimal solution according to a given objective function. For only a few problems we can search through the whole search
+space and return a solution, which had the highest value of an objective function. For most of the problem the problems would be the time to find the best solution inadequately long. We can expect this
+behavior, since the CSP is a NP-complete technique \cite[Garey1979]. However, there are many techniques to search the search space 
+effectively to find the best, or at least good, solution mostly. Commonly used technique is a method called {\em branch and bounds} presented in Algorithm \ref[alg:models:csp-bb]. The key idea of 
+a branch and bound method is restricting of the upper bound of a domain of the variable representing value of an objective function. The branch and bound method can be speeded up by using both
+upper and lower bounds.
+
+\begfigure
+\begalgo
+\+{\bf function} \uppercase{bb-min}($Variables$, $V$, $Constraints$) {\bf returns} optimal solution \cr
+\+\cr
+\+\quad\cleartabs&{\bf variables:} \cleartabs&$Variables$\algfill&a set of variables,\cr 
+\+               &                           &$Constraints$\dotfill&a set of constraints\cr
+\+               &                           &$Solution$\dotfill&a candidate optimal solution\cr
+\+               &                           &$NewSolution$\dotfill&a temporary variable for a current solution\cr
+\+               &                           &$Bound$\dotfill&a current bound\cr
+\+               &                           &$V$\dotfill&a variable with a value of an objective function\cr
+\+\cr
+\+&$Bound \leftarrow sup$\cr
+\+&$NewSolution \leftarrow fail$\cr
+\+&{\bf repeat:}\cr
+\+&\qc&$Solution \leftarrow NewSolution$\cr
+\+&   &$NewSolution \leftarrow Solve(Variables, Constraints \cup \{V < Bound\})$\cr
+\+&   &$Bound \leftarrow$ value of $V$ in $NewSolution$ (if any)\cr
+\+&{\bf until} $NewSolution = fail$\cr
+\+&{\bf return} Solution\cr
+\endalgo\nobreak\medskip
+\label[alg:models:csp-bb]\caption/a Branch and bounds method from \cite[Bartak2007].
+\endfigure
+
+
+
+\label[secc:models:cp-networks]
 \secc Constraint programming problems in networks
 
 As described in \cite[Simonis2006], the problems in networks can be easily modelled using a constraint programming. There are three usual types of the model -- a link-based model, a path-based model
-and a node-based model. 
-
-\secc Link-based model
+and a node-based model. The models were originally formulated for placing demands over the computer networks. Therefore, a bandwidth constraints which use a bandwidth value ${\rm bw}(d)$ are added.
+As we discussed earlier, these constraints are not suitable for ALP and we will not add them into ALP model.
 
 In the {\em link-based model}, for each demand we have one decision variable per link, which states if the link is used for this demand or not.
 
@@ -420,10 +382,7 @@ As we can see on the figure \ref[fig:models:constraint-link], the constraint imp
 There must be either no links from and to the node or there must be just one link ending in the node and just one link beginning in the node. There are two exceptions -- the origin node which is a
 beginning of exactly one link and the destination node which is an end of exactly one node.
 
-\label[secc:models:path-based]
-\secc Path-based model
-
-\pozn{Obrázek zde asi není nutný, protože path-based model je jasný...}In the {\em path-based model}, the decision variables represent paths used to route demands. 
+In the {\em path-based model}, the decision variables represent paths used to route demands. 
 
 \begitems \style N
 * For each demand $d$ we assume there are $path(d)$ possible paths for the demand.
@@ -438,13 +397,11 @@ $$\max\limits_{\{Z_d,T_{id}\}} \sum_{d\in {\bf D}}{\rm val}(d)Z_d \eqmark$$
 
 \noindent and constraints:
 
-$$\forall d \in {\bf D}: \sum_{1 \leq i \leq path(d)}{Y_id = Z_d} \eqmark$$
+$$\forall d \in {\bf D}: \sum_{1 \leq i \leq path(d)}{Y_{id} = Z_d} \eqmark$$
 
 $$\forall e \in {\bf E}: \sum_{d \in {\bf D}}{{\rm bw}(d) \sum_{1 \leq i \leq path(d)}{h_{id}^e Y_{id} \leq {\rm cap}(e)}} \eqmark$$
 
 $$Z_d \in \{0,1\}\quad Y_{id} \in \{0,1\}$$
-
-\secc Node-based model
 
 In the {\em node-based model}, the decision variables represent successor relations between network nodes.
 
@@ -478,5 +435,114 @@ This model needs $|{\bf D}|$ cycle constraints and $|{\bf N}|$ cumulative constr
 pointing to another node on the path and the destination node points to the origin point.
 \endfigure
 
+\secc Constraint programming and ALP
+
+ALP can be easily modelled as a constraint programming problem. The path-based model, as described in section \ref[secc:models:cp-networks], is suitable for ALP, since the expected number of paths 
+is relatively low. Both link-based and node-based models solves not only the problem of optimal transfers, but they must deal with path-finding as well. The duration of a path depends on a shipment
+time. Therefore, the constrained model would need to compute it. This capability would make the model unnecessary complex. Therefore, we use a path-based model as a basis for model solving ALP. 
+
 \sec Mixed integer programming
+
+The CSP based model for ALP consists mostly of sum constraints. Constraint programming can handle such models. Though, there is a better technique for such a model. We will now present {\em Mixed integer
+programming} (MIP\glos{MIP}{Mixed integer programming}), which effectively deals with models based on sums and inequalities.
+
+\secc Linear and integer programming
+
+Mixed integer programming is a method derived from a linear programming method. Linear programming problem is stated as follows \cite[Dantzig1951]:
+
+Find the values of $\lambda_1, \lambda_2, \dots, \lambda_n$ which maximize the linear form
+
+\label[eq:models:lp1]
+$$\lambda_1c_1 + \lambda_2c_2 + \cdots + \lambda_n c_n \eqmark$$
+
+\noindent subject to the conditions that
+
+\label[eq:models:lp2]
+$$\lambda_j\geq 0 \quad (j=1,2,\dots,n) \eqmark$$
+
+\noindent and
+
+\label[eq:models:lp3]
+$$\matrix{
+\lambda_1 a_{11} & + & \lambda_2 a_{12} & \cdots &+& \lambda_n a_{1n} &=& b_1\cr
+\lambda_1 a_{21} & + & \lambda_2 a_{22} & \cdots &+& \lambda_n a_{2n} &=& b_2\cr
+\vdots && \vdots &\ddots&  &&& \vdots\cr
+\vdots && \vdots && \ddots &&& \vdots\cr
+\vdots && \vdots &&& \ddots && \vdots\cr
+\lambda_1 a_{m1} & + & \lambda_2 a_{m2} & \cdots &+& \lambda_n a_{mn} &=& b_m\cr
+} \eqmark$$
+
+There exists a straightforward process to convert any linear program into the form specified in the equations \ref[eq:models:lp1], \ref[eq:models:lp2] and \ref[eq:models:lp3]. The system of linear 
+inequalities defines a polytope as a feasible region. The {\em simplex} algorithm, proposed in \cite[Dantzig1951], finds an optimum by traversing along the edges of polytope until it reaches the
+vertex of the optimum solution. Worst-case time complexity of the simplex algorithm is exponential. However, in the average case the algorithm is polynomial.
+
+\begfigure
+\centerline{\picplaceholder{Simplex on a polytope}}\nobreak\medskip
+\label[fig:models:polytope]\caption/f A twodimensional projection of a polytope defined by feasible region. Steps of the simplex algorithm and an objective function are demonstrated.
+\endfigure
+
+When we restrict the variables to contain only integer values, we get the {\em Integer programming} problem (IP\glos{IP}{Integer programming}). Unfortunately, contrary to LP, the IP is a NP-complete 
+problem \cite[Papadimitriou1981]. The binary variant of logical programming, i.e. the logical programming where variables have a $\{0,1\}$ domain is NP-complete and is part of the Karp's 12 
+NP-complete problems \cite[Karp1972]. Finally, when we combine linear and integer programming, we get the Mixed integer programming problem. This problem is NP-hard as well. However, there exists several
+efficient solvers to this problem such as the SCIP system \cite[Achterberg2008].
+
+\secc Mixed integer program
+
+The {\em mixed integer program} is defines as follows \cite[Achterberg2007]:
+
+Given a matrix $A \in {\bbchar R}^{m \times n}$, vectors $b \in {\bbchar R}^m$, and $c \in {\bbchar R}^n$, and a subset $I \subseteq N = \{1,\dots,m\}$, the mixed integer program $MIP=(A,b,c,I)$ is to
+solve
+
+$$c^* = \min\left\{c^T x | Ax \leq b, x\in {\bbchar R}^n, x_j \in {\bbchar Z} \mathbox{ for all } j \in I \right\}$$
+
+The vectors in the set $X_{MIP} = \left\{x \in {\bbchar R}^n | Ax \leq b, x_j \in {\bbchar Z} \mathbox{ for all } j \in I\right\}$ are called {\em feasible solutions} of MIP. A feasible solution
+$x^* \in X_{MIP}$ is called {\em optimal} if its objective value satisfies $c^T x^* = c^*$.
+
+In contrast to constraint programming, in mixes programming we are restricted to linear constraints, a linear objective function and integer or real-valued domains. 
+We define $l_j$ and $u_j$ as lower and upper bounds of a variable $x_j$. It holds that $l_j \leq x_j \leq u_j$. Next we define a set of binary variables as $B = \{j\in I | l_j = 0 \mathbox{ and }
+u_j = 1\}$. There are following specializations of MIP:
+
+\begitems
+* $I = \emptyset$: linear programs,
+* $I = N$: integer programs,
+* $B = I$: mixed binary programs, and
+* $B = I = N$: Binary programs,
+\enditems
+
+\secc Solution strategies
+
+As discussed in \cite[Achterberg2007], the MIP solvers use previously discussed branch and bounds method to find an optimal solution. First a solver uses a branching rule to branch a search tree. 
+Next, it selects a next subproblem from the search tree to be processed. Afterwards, the selected node is a subject to a domain propagation. Finally the LP relaxation of a node 
+is strenghten by using of a cutting plane separation algorithm.
+
+Commonly used branching technique is {\em branching on variables}. For a problem $Q$, if $x_j, j \in I$, is some integer variable with a fractional value $x_j^\prime$, we obtain two subproblems: 
+one by adding the inequality $x_j \leq \lfloor x_j^\prime \rfloor$ (the {\em left subproblem} denoted as $Q_j^-$) and one by adding the inequality $x_j \geq \lceil x_j^\prime \rceil$ (the {\em right
+subproblem} or $Q_j^+$). More complex branching is rarely incorporated into general MIP solvers.
+
+Once the problem was divided into two subproblems, the solving process can continue with any subproblem that is a leaf of a current search tree. However, the search must handle with two, usually 
+opposing, goals:
+
+\begitems
+* It must find good feasible MIP solutions to improve primal (upper) bound
+* It must improve the global dual (lower) bound.
+\enditems
+
+The integral LP solutions tends to be deep in the search tree \cite[Linderoth1999]. Therefore, the {\em depth first search} seem to be most natural choice. However, it does not fit well with the second
+goal. This goal can be achieved with {\em best first search} method, which always selects a subproblem with the smallest dual bound of all remaining leaves in the tree. As a combination of both methods
+we can use {\em best first search with plunging}. The method first, as long as the current node has unprocessed children, selects one of them as the next node. Otherwise, plunging continues with one
+of the current node's siblings. If no more unprocessed children or siblings are available, the current plunge is completed and a leaf from the tree with best dual bound is selected.
+
+Afterwards, the solver tightens domains of variables by inspecting the constraints and the current domains of other variables at a local subproblem in the search tree. This process is called {\em domain
+propagation} or {\em node processing}. LP relaxation cannot handle holes inside a domain. Therefore MIP solvers only alter bounds of a domain.
+
+Finally, a cut separation phase occurs. The method iteratively refine a feasible set or objective function by adding new linear inequalities called {\em cuts}. There are two basic variants a 
+{\em cut and branch} and {\em branch and cut} depending on whether the cutting planes are only generated at root node or also at local subproblems in the search tree. Despite not being initially 
+accepted, nowadays most common cut separation technique are {\em Gomory mixed integer cuts} described in \cite[Gomory1960]. The method first solves the problem while ignoring the integer requirement.
+If the found solution is not integer, then the method finds a hyperplane with the solution on one side and with all feasible integer points on the other. Afterwards, it transforms the hyperplane to a new 
+inequality and adds it to the  problem.
+
+\secc Mixed integer programming and ALP
+
+Both the ALP and ALP-lp can be easily reformulated as a mixed integer programming problem. We can expect, that this model would have a better performance than CSP based model, since the path-based
+model as described in section \ref[secc:models:cp-networks] uses constraints which are not easily evaluated. On the other hand, the MIP solvers are specialized and tuned up for such type of constraints.
 
