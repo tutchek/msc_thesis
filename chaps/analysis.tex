@@ -4,14 +4,14 @@
 
 \chap Problem analysis
 
-\pozn{Zkontrolovano: ne}In this chapter, we will discuss the problem outlined in the previous chapter. Our goal is to describe the process in such a way to be able to formulate a formalization out of it. The analysis
+\pozn{Zkontrolovano: 27.7.2014}In this chapter, we discuss the problem outlined in the previous chapter. Our goal is to describe the process in such a way in order to be able to formulate a formalization out of it. The analysis
 is based on a real situation in the retail store company called Sunnysoft, which uses the ERP\glos{ERP}{Enterprise resource planning software}\fnote{Enterprise resource planning is a business management software -- usually a suite of integrated applications -- that
 a company can use to store and manage data from every stage of its business.} software Helios.
 
 \sec Description of a problem
 
 For a retail store company, it is important to have the goods distributed evenly across its stores. This requirement is met easily when a particular item is sold in large amounts. In this case, the item
-is usually available in high quantities and can be spread to the company's stores. However, when the item is sold rarely (or the distributor cannot deliver it in desired amounts), its stock supply cannot cover all of the stores sufficiently. In such a case, the goods should be stocked in a store where it gets sold the most. Simultaneously, the store should allow a quick relocation of the goods to another store if needed.
+is usually available in high quantities and can be distributed among the company's stores. However, when the item gets sold rarely (or the distributor cannot deliver it in desired amounts), its stock supply cannot cover all of the stores sufficiently. In such a case, the goods should be stocked in a store where it gets sold the most. Simultaneously, the store should allow a quick relocation of the goods to another store if needed.
 
 \begfigure
 \centerline{\inspic figs/sklady-1.pdf }\nobreak\medskip
@@ -31,13 +31,13 @@ Processes related to goods handling are controlled by documents stored in the ER
 receipt}. The shipment order is a document ordering the store to deliver an item from a warehouse. The picking list is a document which proves that the item was delivered from the warehouse. Finally,
 the warehouse receipt is a document which proves that the item was put to the store. Documents can be related to one another. Typically, there is a following sequence {\em order} $\rightarrow$ {\em shipment order} 
 $\rightarrow$ {\em picking list} $\rightarrow$ {\em invoice} in case the order is made by a customer and a different sequence {\em shipment order in store 1} $\rightarrow$ {\em picking list in store 1} $\rightarrow$
-{\em warehouse receipt in store 2} in case the goods are transferred from one store another. The picking lists and the warehouse receipts can be either unrealised or realised. The document is in effect 
+{\em warehouse receipt in store 2} in case the goods are transferred from one store to another. The picking lists and the warehouse receipts can be either unrealised or realised. The document is in effect 
 (and is unchangeable) after its realisation. Such a document cannot be cancelled or
 deleted. If there is a need to revert the document, an opposite document has to be created and realised. For each item and each store, the ERP system stores a number representing the amount of pieces in the store. Let us call it {\em InStock}. The {\em InStock} gets updated by the realised picking lists and the realised warehouse receipts. Schematically, it can be expressed as follows:
 
 $$InStock_{g,s} = \sum_{wr \in rWR_s}{\left( \mathbox{\# of items of $g$ on $wr$}  \right)} - \sum_{pl \in rPL_s}{\left(\mathbox{\# of items of $g$ on $pl$}\right)},$$
 
-\noindent where $g$ is a particular commodity, $s$ is a particular store, $rWR_s$ is a set of realised warehouse receipts in the store $s$ and $rPL_s$ is a set of realised picking lists in the store $s$. 
+\noindent where $g$ is a particular commodity, $s$ is a particular store, $rWR_s$ is a set of realised warehouse receipts in store $s$ and $rPL_s$ is a set of realised picking lists in store $s$. 
 The store operators are responsible for any differences created in the amounts of goods between {\em InStock} and the real amount. Therefore, we may assume that this number is valid and there is no need to 
 prepare a backup plan in regards to a situation where there is a missing item.
 
@@ -47,7 +47,7 @@ is performed with shipment orders. We define a variable {\em Availability} as fo
 
 $$Availability_{g,s} = InStock_{g,s} - \sum_{so \in SO_s}{\left( \mathbox{\# of unhandled items of $g$ on $so$} \right)},$$
 
-\noindent where $g$ and $s$ have the same meaning as mentioned above and $SO_s$ is a set of shipment orders in the store $s$. As we can imagine, the availability can be negative, i.e. the demand for an article might be larger 
+\noindent where $g$ and $s$ have the same meaning as mentioned above and $SO_s$ is a set of shipment orders in store $s$. As we can imagine, the availability can be negative, i.e. the demand for an article might be larger 
 than the amount in that particular store and therefore, the article needs to be transferred from another store or ordered from the supplier.
 
 This model has one disadvantage, which can lead to the irregularity described in section \ref[sec:analysis:queue-jumping]. Since the ERP system only stores the amount of goods in a store, the amount
@@ -63,9 +63,9 @@ the ERP preconfigured to show only the shipment orders, which can be at least pa
 
 As we described in section \ref[secc:analysis:process-driven], we can detect the missing goods in order to plan their transfer from another store. However, such a transfer is very often planned with
 small amounts of transferred goods. Therefore, we need some heuristics to estimate the need for a particular article in a given store and plan the transfer accordingly to this estimation. However,
-these transfers are different from transfers dealing with negative $Availability$ (we will call them ``covering transfers", since they cover the missing items). The covering transfers must be processed as
+these transfers are different from transfers dealing with negative $Availability$ (we call them ``covering transfers", since they cover the missing items). The covering transfers must be processed as
 soon as possible for they indicate that there is a customer waiting for that particular item. The other transfers can be postponed (especially in the case of a store outage described in section 
-\ref[secc:analysis:outage]) and will be handled after the covering transfers are processed. Thus, we introduce a label ``low-priority transfer" for a transfer, which does not necessarily need to be processed immediately.
+\ref[secc:analysis:outage]) and are handled after the covering transfers are processed. Thus, we introduce a label ``low-priority transfer" for a transfer, which does not necessarily need to be processed immediately.
 
 \secc The goods ``on the way"
 
@@ -115,10 +115,10 @@ These irregularities can compromise the whole process and therefore we will pay 
 \secc Queue jumping
 
 When an item is ordered by a customer or when it is planned for a relocation, it is blocked by a shipment order and is no longer available. However, sometimes a salesman does not respect the blocking and
-sells the goods despite its being blocked. The reason for such an action can vary and in fact is not important for our purposes, but the outcome is the same. Either there is a customer whose order was
+sells the goods despite its being blocked. The reason for such an action can vary and in fact, is not important for our purposes, but the outcome is the same. Either there is a customer whose order was
 not processed in time or there is a planned transfer of goods which cannot be processed because the goods is no longer available in that store.
 
-This is a result of a combined system where the inputs are generated either by computers or by humans. Since it cannot be avoided, the system should be able to handle such situations. If there is a planned 
+This is the result of a combined system where the inputs are generated either by computers or by humans. Since it cannot be avoided, the system should be able to handle such situations. If there is a planned 
 low-priority transfer as described in section \ref[secc:analysis:low-priority], the transfer can be cancelled and the item that was to be transferred can replace the missing goods. If there is no such 
 goods available, the system should plan a transfer from another store, where the item is available.
 
@@ -135,9 +135,11 @@ take into an account a planned outage, but with an unplanned outage we have to p
 In the latter case, the store can receive and send goods marked for high-priority transfers (i.e. the transfers dealing with the negative $Availability$ on a store), but will most probably not process the
 low-priority transfers.
 
+
+\label[sec:analysis:alp]
 \sec Automated logistics problem formulation
 
-Based on the description if the previous sections, we now formulate an on-line {\em Automated logistics problem} (ALP\glos{ALP}{Automated logistics problem}), which is to be solved in this thesis. 
+Based on the description of the previous sections, we now formulate an on-line {\em Automated logistics problem} (ALP\glos{ALP}{Automated logistics problem}), which is to be solved in this thesis. 
 Given a 5-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock)$, where:
 
 \begitems
@@ -145,13 +147,13 @@ Given a 5-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock)$, where:
 * ${\bf G}$ is a set of goods.
 * ${\bf Del}$ is a set of delivery routes between stores in ${\bf S}$. A delivery route is a 4-tuple $(s_o, s_d, T_s, T_d)$, where $s_o \in {\bf S}$ is an origin store, $s_d \in {\bf S}$ is a destination
 store, $T_s$ is a time of shipment from $s_o$, and $T_d$ is a time of delivery to $s_d$.
-* ${\bf D}$ is an ordered set of demands. A demand is a triple $(s, g, amount)$, where $s \in {\bf S}$ is a store where is the demand placed, $g \in {\bf G}$ is a goods demanded by the demand and
-an $amount$ is the demanded amount of the goods.
-* $OnStock \colon {\bf G} \times {\bf S} \to {\bbchar N}$, a function returning an amount of items of goods, which is present in the store and are not scheduled for transfer.
+* ${\bf D}$ is an ordered set of demands. A demand is a 4-tuple $(s, g, amount, date)$, where $s \in {\bf S}$ is a store where is the demand placed, $g \in {\bf G}$ is a goods demanded by the demand,
+an $amount$ is the demanded amount of the goods and $date$ is a date when the demand was placed.
+* $OnStock \colon {\bf G} \times {\bf S} \to {\bbchar N}$, a function returning an amount of items of goods, which is present in the store and is not scheduled for transfer.
 \enditems
 
-\noindent Find an optimal schedule {\bf Sch}, which is a set of plans. A plan is 5-tuple $(s_o,\penalty0  s_d,\penalty0  g,\penalty0  amount,\penalty0  d)$,  where $s_o, s_d \in {\bf S}$ are an 
-origin and a destination store,\penalty0  $g \in {\bf G}$ is a goods, $amount$ is an amount of goods to be transferred and $d \in {\bf D}$ is the demand which is solved by the plan.
+\noindent Find an optimal schedule {\bf Sch}, which is a set of plans. A plan is 5-tuple $(s_o,\penalty0  s_d,\penalty0  g,\penalty0  amount,\penalty0  d)$,  where $s_o, s_d \in {\bf S}$ are 
+original and destination stores,\penalty0  $g \in {\bf G}$ is goods, $amount$ is an amount of goods to be transferred and $d \in {\bf D}$ is the demand which is solved by the plan.
 The optimality of the schedule {\bf Sch} is measured according to the objective function:
 
 $$\min\quad \sum_{p \in {\bf Sch}}{{\rm duration}(p)}\eqmark$$
@@ -187,7 +189,7 @@ $$\forall g \in {\bf G}\colon \sum_{\scriptstyle p \in {\bf Sch}\atop\scriptstyl
 
 \secc ALP with low-priority demands
 
-As discussed in section \ref[secc:analysis:low-priority], we can place low-priority demands. These demands can be ignored, if the store would become overloaded. To model this situation, we
+As discussed in section \ref[secc:analysis:low-priority], we can place low-priority demands. These demands can be ignored, if the store becomes overloaded. To model this situation, we
 introduce an {\em Automated logistics problem with low-priority demands} (ALP-lp\glos{ALP-lp}{Automated logistics problem with low-priority demands}) as a variation to ALP. We describe only differences
 to the original problem.
 
@@ -195,11 +197,11 @@ ALP-lp is a 6-tuple $({\bf G}, {\bf S}, {\bf Del}, {\bf D}, OnStock, Capacity, P
 
 \begitems
 * ${\bf G}$, ${\bf S}$, ${\bf Del}$, ${\bf Del}$, ${\bf D}$ and $OnStock$ have the same meaning as in ALP.
-* $Capacity \colon {\bf S} \to {\bbchar N}$ is a function which returns a capacity of a given store, i.e. the maximal daily amount of items of goods which can be processed by the store.
-* $Priority \colon {\bf D} \to \{high, low\}$ is a function which returns a priority of a given demand.
+* $Capacity \colon {\bf S} \to {\bbchar N}$ is a function which returns a capacity of a given store, i.e. the maximum daily amount of the items of goods processed by the store.
+* $Priority \colon {\bf D} \to \{high, low\}$ is a function which returns a priority of the given demand.
 \enditems
 
-The objective function differs as we need to fulfil two goals, which are in contradiction. The task is to find the shortest schedule, just like in the case of ALP. However, the simple way how to achieve
+The objective function differs as we need to fulfil two goals, which are in contradiction. The task is to find the shortest schedule, just like in the case of ALP. However, the simple way of achieving
 that state is to ignore all low-priority demands. Therefore ALP-lp is a multiple-criteria optimization problem.
 
 $$\min\quad \sum_{p \in {\bf Sch}}{{\rm duration}(p)}\eqmark$$
@@ -215,8 +217,8 @@ $$ \forall p \in {\bf Sch}\colon {\rm demand}(p) = d \Rightarrow \forall d' \pre
 $$\hskip\displaywidth minus 1fill {\rm amount}(d') =\hskip-2em \sum_{\scriptstyle p \in {\bf Sch}\atop \scriptstyle 
 {\rm demand}(p) = d'}{\hskip-2em {\rm amount}(p)} \eqmark$$
 
-* The capacity of a store cannot be exceeded if possible. Each store cannot process more items of goods per day than its capacity. Otherwise, the store cannot process low-priority demands. We use a 
-function $at(p, s)$ which returns an id of a day, when the plan $p$ is processed in a store $s$.
+* The capacity of a store cannot be exceeded if possible. Each store cannot process more items of goods per day than is its capacity. Otherwise, the store cannot process low-priority demands. We use a 
+function $at(p, s)$ which returns a number representing the day, when the plan $p$ is processed in store $s$.
 
 $$ \forall s \in {\bf S}, \forall t \in \{at(p, s) | \forall p \in {\bf Sch}, \forall s \in {\bf S} \}: \hskip\displaywidth minus 1fill $$
 $$\hskip\displaywidth minus 1fill\sum_{\scriptstyle p \in {\bf Sch}\atop \scriptstyle at(p, s) = t}{Amount(d)} \geq Capacity(s) \Rightarrow \sum_{\scriptstyle p \in {\bf Sch}\atop 

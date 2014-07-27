@@ -1,5 +1,9 @@
 prologues:=3;
-verbatimtex \input common etex
+verbatimtex 
+\input cs-pagella 
+\setmathfamily \bffam \tenbf
+\setmathfamily \bifam \tenbi
+etex
 
 input boxes;
 

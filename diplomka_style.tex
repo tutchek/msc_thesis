@@ -148,7 +148,7 @@
 
 \long\def\parbox#1#2{{\emergencystretch=1em\hsize=#1\baselineskip=12pt\lineskip=1pt\lineskiplimit=0pt\vtop{#2\par}}}
 
-\def\argmin{\mathop{\rm arg\,min}}
+\def\argmin{\mathop{\rm arg\,min}\limits}
 \def\algfill{\hbox to2em{\dotfill}}
 
 %%% Outlines
@@ -205,3 +205,9 @@
 \def\thednum{(\the\chapnum.\the\secnum.\the\dnum)}
 
 \def\qc{\quad\cleartabs}
+
+\newif\ifzahlavinazev \zahlavinazevfalse
+
+\def\nastavzahlavi{\ifzahlavinazev\def\zahlavi{\noindent{\it Bc. Michal Tuláček \kern3pt\headrule\kern3pt \the\title}}\else\def\zahlavi{\hfill}\fi}
+\def\zahlavinazev{\zahlavinazevtrue}
+\def\zahlaviprazdne{\zahlavinazevfalse}
