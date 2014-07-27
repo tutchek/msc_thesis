@@ -3,7 +3,7 @@
 \label[chap:model]
 \chap Algorithms for automated logistics
 
-\pozn{Zkontrolovano: ne}In this chapter we propose algorithms for ALP, as defined in chapter \ref[chap:analysis].
+\pozn{Zkontrolovano: 27.7.2014}In this chapter, we propose algorithms for ALP, as defined in chapter \ref[chap:analysis].
 
 \sec Preliminary tasks
 
@@ -12,7 +12,7 @@ In this section we summarize the tasks, which must be performed prior to running
 \secc Schema of the system
 
 The whole process is directed by documents in the ERP system. The system will first get information from the ERP system, plan new transfers and produce new documents to the ERP system. 
-The basic schema of the algorithm is shown on the Figure \ref[fig:algorithm:basic-schema].
+The basic schema of the algorithm is shown on Figure \ref[fig:algorithm:basic-schema].
 
 \begfigure
 \centerline{\inspic figs/algorithm-basic-schema-1.pdf }\nobreak\medskip
@@ -22,7 +22,7 @@ The basic schema of the algorithm is shown on the Figure \ref[fig:algorithm:basi
 In general, the system performs the following steps:
 
 \begitems \style N
-* The system loads data from the ERP. It gets the information about pending transfers, availability of goods and demands for goods 
+* The system loads data from ERP. It gets the information about pending transfers, availability of goods and demands for goods. 
 * Afterwards, it receives demands from an external software system responsible for balancing the goods on stores.
 * Then, the system uses one of the algorithms to plan the transfers of goods to meet the requirements.
 * Finally, the system generates or alters the documents in ERP to perform plans generated in the Step 3.
@@ -32,13 +32,13 @@ In general, the system performs the following steps:
 
 For the purposes of proper planning, we need to estimate a duration of planned transfers. After the system creates a shipment order, an employee must process it. They must search for the demanded goods
 in the store, pack it and hand it over to a delivery company. As described in section \ref[sec:analysis:pickup], the delivery company stops only once in a while. If the goods is not prepared in time for
-the pick-up, it will be handed over on the next pick-up. To compute a delivery time, we use the algorithm \ref[alg:algorithm:delivery-time].
+the pick-up, it will be handed over in the next pick-up. To compute a delivery time, we use the algorithm \ref[alg:algorithm:delivery-time].
 
 \begfigure
 \begalgo
 \+{\bf function} \uppercase{delivery--time}($path$, $time$)\cr
 \+\kern2cm{\bf returns} a delivery time after transferring goods along the path\cr
-\+\quad\cleartabs&\bf variables: &$path$\hbox to2em{\dotfill}&a sequence of stores $s$ from the origin store $s_0$ to the\cr
+\+\quad\cleartabs&\bf variables: &$path$\hbox to2em{\dotfill}&a sequence of stores $s$ from the original store $s_0$ to the\cr
 \+               &            &        &destination store $s_n$.\cr
 \+               &            &$time$\dotfill&a shipment time\cr
 \+               &            &$T$\dotfill&a computed total time, initially zero\cr
@@ -67,7 +67,7 @@ the pick-up, it will be handed over on the next pick-up. To compute a delivery t
 \label[alg:algorithm:delivery-time]\caption/a Algorithm for computing the delivery time 
 \endfigure
 
-The delivery companies as well as stores do not operate during weekends and public holidays. The algorithm \ref[alg:algorithm:delivery-time] take into account this condition on the lines 
+The delivery companies as well as stores do not operate during weekends and public holidays. The algorithm \ref[alg:algorithm:delivery-time] takes into account this condition on the lines 
 \ref[alg:algorithm:delivery-time:a1], \ref[alg:algorithm:delivery-time:a2] and \ref[alg:algorithm:delivery-time:a3], since the prolongation is included in the delivery time and time
 needed to prepare and receive a shipment.
 
@@ -131,11 +131,11 @@ of queue jumping described in section \ref[sec:algorithm:queue-jumping], because
 
 In this section, we will describe a na\I ve algorithm for ALP. This algorithm only covers the current insufficiency in stores and does not respect an order of 
 precedence of shipment orders. However, this approach is still reasonable if there is enough goods in other stores and if we run the algorithm regularly. Even though the algorithm
-itself does not maintain an order of demands (i.e. the constraint \ref[eq:analysis:alp-c3] on page \pgref[eq:analysis:alp-c3]), if it is run regularly in a small time steps, the constraint 
+itself does not maintain an order of demands (i.e. the constraint \ref[eq:analysis:alp-c3] on page \pgref[eq:analysis:alp-c3]), if it is run regularly in small time steps, the constraint 
 will be satisfied implicitly. The order will not be maintained only for the demands which arise between the time steps. The shorter the time step is, the lesser amount of demands is affected.
 The algorithm does not deal with capacity constraints. Therefore, it is not suitable for ALP-lp and ALP-lp2.
 
-For each type of goods, the algorithm divides stores into two groups according to the available amount of the goods. The first group of stores $S$ (source stores) contains stores where 
+For each type of goods, the algorithm divides stores into two groups according to the available amount of goods. The first group of stores $S$ (source stores) contains stores where 
 the available amount of goods is positive. The second group of stores $D$ (destination stores) contains stores where the available amount of goods is negative.
 
 The algorithm is run separately for each type of goods. The algorithm picks up the first store in $D$ and searches for the fastest transfer from a store in $S$. The algorithm is listed in detail as an 
@@ -186,17 +186,16 @@ The na\I ve algorithm is used to compare the Ford-Fulkerson based, CSP based, an
 The more advanced algorithm is based on the Ford-Fulkerson algorithm described in section \ref[sec:research:network-flows]. This algorithm solves an ALP problem while maintaining the order of demands.
 However, it is not able to handle constraints preventing overloading.  
 
-For each goods we construct a graph as showed on Figure \ref[fig:algorithm:ford-fulkerson]. The capacities of edges from the source corresponds to the amount of available goods in the particular store
-and the capacities of edges to the destination corresponds to the demanded amount of goods in the stores.
-Then we use the Ford-Fulkerson algorithm, to find the maximal flow through the network. Augmenting paths generated by the algorithm are then transformed to documents in ERP. The algorithm differs from 
+For each of goods, we construct a graph as showed on Figure \ref[fig:algorithm:ford-fulkerson]. The capacities of edges from the source correspond to the amount of available goods in the particular store
+and the capacities of edges to the destination correspond to the demanded amount of goods in the stores.
+Then, we use the Ford-Fulkerson algorithm to find the maximum flow through the network. Augmenting paths generated by the algorithm are then transformed to documents in ERP. The algorithm differs from 
 the original algorithm in a way, in which it selects an augmenting path to be added. First, we process demands in their orders. For each demand, we search for a suitable path with the shortest duration.
-Since the original Ford-Fulkerson algorithm allows us to place augmenting paths in any order and finds the maximal flow through network, it is guaranteed that our algorithm finds the maximal flow
-in the network as well. Moreover, by proper selection of paths to be added, it 
+Since the original Ford-Fulkerson algorithm allows us to place augmenting paths in any order and finds the maximum flow through network, it is guaranteed that our algorithm finds the maximum flow
+in the network, as well.
 
 \begfigure
 \centerline{\inspic figs/algorithm-ford-fulkerson-1.pdf }\nobreak\medskip
-\label[fig:algorithm:ford-fulkerson]\caption/f A bipartite graph construed for the Ford--Fulkerson based algorithm. There are five stores $s_n$ with the amount of available goods $a_n$ and the demanded amount $d_n$. The augmenting path $({\bf 0}, s_2, s_4, {\bf 1})$ is highlighted. All edges have left-to-right direction. We did not draw the edges as arrows since due to to their count, it would become 
-hard to read the picture.
+\label[fig:algorithm:ford-fulkerson]\caption/f A bipartite graph construed for the Ford--Fulkerson based algorithm. There are five stores $s_n$ with the amount of available goods $a_n$ and the demanded amount $d_n$. The augmenting path $({\bf 0}, s_2, s_4, {\bf 1})$ is highlighted. All edges have left-to-right direction. The edges are not drawn as arrows since due to their amount the picture would become unreadable.
 \endfigure
 
 Now we describe the algorithm in a detail. The Ford-Fulkerson finds the maximum flow in a given network. It searches for augmenting paths from the source to the sink of the network. An augmenting path is a path where all of its 
@@ -213,7 +212,7 @@ $$\{{\bf 0}, {\bf 1}\} \cap \left( {\bf S}\cup {\bf D} \right) = \emptyset \eqma
 
 $${\bf E} = \{({\bf 0}, s)| s \in {\bf S}\} \cup \{(s_s, s_d) | s_d \in {\bf S}, s_d \in {\bf D}\} \cup \{(s, {\bf 1}) | s \in {\bf D}\} \eqmark$$
 
-For each possible delivery route between the stores $s_s \in S$ and $s_d \in D$ there is an edge $(s_s, s_d) \in E$ with an unlimited capacity. Finally, for each node $s_s \in S$ there is an edge 
+For each possible delivery route between the stores $s_s \in S$ and $s_d \in D$, there is an edge $(s_s, s_d) \in E$ with an unlimited capacity. Finally, for each node $s_s \in S$ there is an edge 
 $(0,s_s)\in E$ with capacity representing the amount of available goods in store $s_s$. Similarly, for each node $s_d \in D$ there is an edge $(s_d,1) \in E$ with capacity representing the
 demanded amount of goods in store $s_d$. We allow only integer flows.
 
@@ -282,8 +281,8 @@ as Algorithm \ref[alg:algorithm:ford-fulkerson] on page \pgref[alg:algorithm:for
 \sec CSP model
 
 We propose a model based on the path-based model described in section \ref[sec:models:networks]. As we have mentioned, we are not limited by the capacity of edges and we plan to transfer lots of
-types of goods at once. However, we need to prevent overloading of stores. Therefore, we chose a path-based model and we propose a CSP model based on it. The model solves both ALP and ALP-lp.
-Since the ALP-lp is a multiple-criteria optimization problem, the model depends on two parameter $\alpha$ and $\beta$, one for each goal of ALP-lp.
+types of goods at once. However, we need to prevent the overload of stores. Therefore, we choose a path-based model and we propose a CSP model based on it. The model solves both ALP and ALP-lp.
+Since the ALP-lp is a multiple-criteria optimization problem, the model depends on two parameters $\alpha$ and $\beta$, one for each goal of ALP-lp.
 
 \begitems 
 * ${\bf S}$, a set of stores.
@@ -291,12 +290,12 @@ Since the ALP-lp is a multiple-criteria optimization problem, the model depends 
 * ${\bf D}$, a set of demands. When a demand $i$ has been placed before a demand $j$, it holds that $i < j$. 
 * ${\bf P}$, a set of all possible paths between stores.
 * ${\bf T}$, a set of time events.
-* ${\rm Orig} \colon {\bf P} \rightarrow {\bf S}$, a function returning an origin store of a given path.
+* ${\rm Orig} \colon {\bf P} \rightarrow {\bf S}$, a function returning an original store of a given path.
 * ${\rm Dest} \colon {\bf P} \rightarrow {\bf S}$, a function returning a destination store of a given path.
 * ${\rm Amount} \colon {\bf D}\times{\bf G} \rightarrow {\bbchar N}_0$, a function returning an amount of goods demanded by a given demand.
 * ${\rm Availability} \colon {\bf G} \times {\bf S} \rightarrow {\bbchar Z}$, a function returning an amount of goods available in a given store. It is a difference between $OnStock$ and a sum of all demands on a given store for the goods.
 * ${\rm Capacity} \colon {\bf S} \rightarrow {\bbchar N}$, a function returning a daily capacity of a given store.
-* ${\rm Duration} \colon {\bf P} \rightarrow {\bf T}$, a function returning a time needed to transfer goods along the path, when send right after the execution of the algorithm.
+* ${\rm Duration} \colon {\bf P} \rightarrow {\bf T}$, a function returning a time needed to transfer goods along the path, when sent right after the execution of the algorithm.
 * ${\rm OnTheWay} \colon {\bf G} \times {\bf S} \rightarrow {\bbchar N}_0$, a function returning an amount of goods which is delivered to a given store.
 * ${\rm Pri} \colon {\bf D} \rightarrow \{{\rm high}, {\rm low}\}$, a function returning a priority for a given demand.
 * ${\rm Time} \colon {\bf P}\times{\bf S}\rightarrow{\cal P}({\bf T})$, a function returning for a given store and path days when the goods sent along the path will be in the store. 
@@ -363,7 +362,7 @@ For the demands itself, we define constraints \ref[model:constraint:demand-sum] 
 
 For the objective function, as described below, it is useful to introduce a constraint \ref[model:constraint:decision], which allows us to detect used paths.
 
-To enforce an order of precedence we introduce a constraint \ref[model:constraint:order]. We can plan a transfer for a demand only if all previous demands were resolved, i.e. the sum of goods which is 
+To enforce an order of precedence, we introduce a constraint \ref[model:constraint:order]. We can plan a transfer for a demand only if all previous demands were resolved, i.e. the sum of goods which is 
 currently on the way and of all already planned transfers for the goods covers at least the sum of demanded amount of goods on the demands.
 
 
@@ -376,7 +375,7 @@ Finally, we introduce a constraint \ref[model:constraint:overload] which prevent
 high-priority transfer but we cannot plan a low-priority transfer through a store, if it would cause its overload.
 
 
-For this model we introduce an objective function \ref[model:constraint:of]. There are two requirements for the solution. First, the final plan should be as fast as possible. Secondly, as many demands
+For this model, we introduce an objective function \ref[model:constraint:of]. There are two requirements for the solution. First, the final plan should be as fast as possible. Secondly, as many demands
 as possible should be resolved. These two requirements are contradictory. If we decide to avoid all of the low-priority transfers, we will get faster plan than if we have resolved some of them.
 On the other hand, if we decide to resolve as many as possible low-priority transfers, the resulting plan does not have to be the fastest one. Therefore, we introduce the parameters $\alpha$ and $\beta$.
 We can use them to tune the model to our needs.
@@ -406,7 +405,7 @@ To model the ALP-lp2 model, we use the CSP based model as described in section \
 \noindent Next, we add a new decision variable:
 
 \begitems
-* $W^g_{d}\in \{0,1\}$, a decision variable representing whether the demand $d$ for a goods $g$ is at least partially resolved.
+* $W^g_{d}\in \{0,1\}$, a decision variable representing whether the demand $d$ for goods $g$ is at least partially resolved.
 \enditems
 
 \noindent For the new variable, we add a corresponding constraint:
@@ -421,26 +420,26 @@ $$\min\left\{\sum_{g\in {\bf G}}\sum_{d \in {\bf D}}\sum_{p \in {\bf P}}{X^g_{dp
 
 \secc CSP solver
 
-To implement the previously stated model, we use a state of the art CSP\glos{CSP}{Constraint satisfaction problem} solver. Nowadays, there are many solvers available but we sought for a cost optimal solution, which is preferably Java based, since it would easily merge with other Sunnysoft program environment. Therefore, based on the experiences in \cite[Tulacek2009] we used a Java based CSP solver 
+To implement the previously stated model, we use a state of the art CSP\glos{CSP}{Constraint satisfaction problem} solver. Nowadays, there are many solvers available but we seek for a cost optimal solution, which is preferably Java based, since it would easily merged with other Sunnysoft program environment. Therefore, based on the experience in \cite[Tulacek2009] we used a Java based CSP solver 
 Choco \cite[choco].
 
 The proposed constraints can be directly rewritten in Choco. Thus, we did not need to reformulate the model to meet the available constraints. Still, there are some issues connected to the 
 implementation. Some of them are discussed in the Appendix \ref[ap:implementation].
 
-The solver offers us to choose a search strategies out of many predefined strategies or to implement own search strategy. By default, the solver uses a {\em minimum domain lower bound strategy} on all 
+The solver offers us to choose a search strategies out of many predefined strategies or to implement our own search strategy. By default, the solver uses a {\em minimum domain lower bound strategy} on all 
 integer variables and {\em lexicographic upper bound strategy} on all binary variables. The minimum domain lower bound strategy selects a variable $x$ using the first-fail strategy, described in section 
-\ref[sec:models:constraint-programming] and tries set its value to the lower bound of its domain, i.e. $x = lower\_bound(D_x)$. In the case of binary variables, all of them have a domain containing
+\ref[sec:models:constraint-programming] and tries to set its value to the lower bound of its domain, i.e. $x = lower\_bound(D_x)$. In case of binary variables, all of them have a domain containing
 one or two elements. Therefore, Choco solver does not use the first-fail strategy. Instead, it simply selects the variables in order, in which they were posted to the solver and tries to assign them
 their current upper boundary.
 
-The default strategy is usually not optimal, since it tries assign values to all variables, no matter of their importance for the problem. For example, in our CSP based model, we have to introduce
-auxiliary variables, which hold results of the sum constraints. However, all of them depends exclusively on values of $Y^g_{dp}$. Therefore, we should alter the default strategy
+The default strategy is usually not optimal, since it tries to assign values to all variables, disregarding their importance to the problem. For example, in our CSP based model, we have to introduce
+auxiliary variables, which hold results of the sum constraints. However, all of them depend exclusively on values of $Y^g_{dp}$. Therefore, we should alter the default strategy
 to only search through $Y^g_{dp}$ variables, since all other variables in the problem are derived from them.
 
 \sec MIP model
 
 The model described in section \ref[model:sec:csp], is not the optimal model for CSP. In a typical CSP model, there is no problem with sum constraints. However, the model consist of sums almost
-entirely. For such a model is the method not suitable. However, with a slight modification, we can reformulate it as a MIP problem. MIP solvers are optimized for sum constraints. Compared to CSP 
+entirely. For such a model, the method is not suitable. However, with a slight modification, we can reformulate it as a MIP problem. MIP solvers are optimized for sum constraints. Compared to CSP 
 solvers, MIP solvers are more effective in this type of problem \cite[Carsten1995].
 
 The model uses the same sets and functions, as the CSP model described in section \ref[model:sec:csp]. We reuse constrained variables $X^g_{dp}$, $Y^g_{dp}$ and $Z^g_d$ and add the following new
@@ -484,24 +483,24 @@ $$\hskip\displaywidth minus 1fill  -\hskip-1em\sum_{\scriptstyle d' \in {\bf D}\
 $$\forall s \in {\bf S}, \forall t \in {\bf T}\colon \sum_{g \in {\bf G}}\sum_{d\in{\bf D}}\sum_{p \in {\bf P}}{Y^g_{dp}} \leq {\rm Capacity}(s) - 1 + \mu U_{st} \eqmark$$
 $$\forall s \in {\bf S}, \forall t \in {\bf T}\colon \sum_{g \in {\bf G}}\sum_{d\in{\bf D}}\sum_{p \in {\bf P}}{Y^g_{dp}} \leq 0 + \mu(1- U_{st}) \eqmark$$
 
-Most of the constraints are the same as in CSP based model. We will not repeat their description and only comment the new constraints.
+Most of the constraints are the same as in CSP based model. We will not repeat their description and only add comments to the new constraints.
 
-The equations \ref[eq:model:mip:xy:1] and \ref[eq:model:mip:xy:2] enforce the condition $Y^g_{dp} > 0 \Leftrightarrow X^g_{dp} = 1$. We use here a trick, which enables to state a constraint that one of 
-the conditions holds. It is either $Y^g_{dp} = 0 \wedge X^g_{dp} = 0$ or $Y^g_{dp} > 0 \wedge X^g_{dp} = 1$. First, we modify the conditions to contain non strict inequalities with the same 
+The equations \ref[eq:model:mip:xy:1] and \ref[eq:model:mip:xy:2] enforce the condition $Y^g_{dp} > 0 \Leftrightarrow X^g_{dp} = 1$. Here, we use a trick, which enables us to set a constraint in a way that only one of 
+the two conditions is valid. It is either $Y^g_{dp} = 0 \wedge X^g_{dp} = 0$ or $Y^g_{dp} > 0 \wedge X^g_{dp} = 1$. First, we modify the conditions to contain non strict inequalities in the same 
 direction:\break 
 $Y^g_{dp} \leq 0 \wedge X^g_{dp} = 0$ or $-Y^g_{dp} \leq -1  \wedge X^g_{dp} = 1$. Then, we introduce a dummy constant $\mu$ with a large value, which is a coefficient for $X^g_{dp}$ variable.
 When $X^g_{dp} = 0$, then the equation \ref[eq:model:mip:xy:1] becomes $Y^g_{dp} \leq 0$ and the equation \ref[eq:model:mip:xy:2] becomes $-Y^g_{dp} \leq -1 + \mu$. Since $\mu$ is a large number,
-the second constraint is always satisfied and only the first one is acting. Similarly, when $X^g_{dp} = 1$ then the first constraint is allways satisfied and the second one is acting.
+the second constraint is always satisfied and only the first one is enforced. Similarly, when $X^g_{dp} = 1$ then the first constraint is always satisfied and the second one is enforced.
 %First, we split the equivalence into two statements,  $Y^g_{dp} - X^g_{dp} \leq 0$
 
 \secc Variations of the MIP based model
 
-\sec MIP solver
+\secc MIP solver
 
-To solve MIP based problem, we use a state of the art solver, just like in the case of CSP based problem. We use a solver SCIP \cite[Achterberg2008], which is wrapped for Java langauage
+To solve MIP based problem, we use a state of the art solver, just like in the case of CSP based problem. We use a solver SCIP \cite[Achterberg2008], which is wrapped for Java language
 in OR-tools developed by Google \cite[Perron2011]. The SCIP system is one of the fastest non-commercial solvers for mixed integer programming \cite[Mittelmann2014].
 
-The SCIP system is freely available only for non-commercial use. Although, the OR-tools provide a general interface for linear solvers, therefore, we can simply switch the underlying solver system.
-However, since the interface is general, it does not provide a way to send information about the problem to the solver, as we did in case of CSP solver.
+The SCIP system is freely available only for non-commercial use. As the OR-tools system provides a general interface for linear solvers, we can simply switch the underlying solver system.
+However, since the interface is general, it does not provide a way of sending information about the problem to the solver, as we did in case of CSP solver.
 
 
